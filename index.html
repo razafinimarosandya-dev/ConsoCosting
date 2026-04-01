@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conso Tasks</title>
+</head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --bg-color: #f7f9fb;
+  --surface-color: #ffffff;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --border-color: #e5e7eb;
+
+  --status-pending-bg: #ecfdf5;
+  --status-pending-text: #059669;
+  --status-completed-bg: #ecfdf5;
+  --status-completed-text: #059669;
+  --status-inprogress-bg: #ecfdf5;
+  --status-inprogress-text: #059669;
+  --status-draft-bg: #f3f4f6;
+  --status-draft-text: #374151;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: var(--transition);
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  outline: none;
+  transition: var(--transition);
+}
+
+.input-field:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Layout container */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 32px;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  background-color: var(--primary-color);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: #f3f4f6;
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  width: 240px;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
+  outline: none;
+  color: var(--text-main);
+}
+
+.search-bar input::placeholder {
+  color: var(--text-muted);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.nav-links a.active {
+  color: var(--primary-color);
+  position: relative;
+}
+
+.nav-links a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-color);
+  border-radius: 2px 2px 0 0;
+}
+
+.nav-links a:hover:not(.active) {
+  color: var(--text-main);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background-color: transparent;
+  transition: var(--transition);
+}
+
+.icon-btn:hover {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  transform: scale(1.05);
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-title .subtitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.page-title h1 {
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+/* Split Layout */
+.grid-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Cards */
+.card {
+  background-color: var(--surface-color);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Request Banner */
+.request-banner {
+  background-color: var(--bg-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.request-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.request-info-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.request-info-top .badge {
+  background-color: #dbeafe;
+  color: #1e40af;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.request-info-top h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.request-info-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.request-info-meta span {
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.btn-secondary {
+  color: var(--primary-color);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #bfdbfe;
+  background-color: #eff6ff;
+  border-radius: 6px;
+}
+
+.btn-secondary:hover {
+  background-color: #dbeafe;
+}
+
+/* Tab Toggle */
+.tabs {
+  display: flex;
+  background-color: #f3f4f6;
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.tab.active {
+  background-color: var(--surface-color);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tab:hover:not(.active) {
+  color: var(--text-main);
+  background-color: #e5e7eb;
+}
+
+/* Drag and Drop Area */
+.dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--radius-lg);
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #f8fafc;
+  transition: var(--transition);
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+
+.dropzone:hover {
+  border-color: var(--primary-color);
+  background-color: #eff6ff;
+}
+
+.dropzone-icon {
+  width: 48px;
+  height: 48px;
+  background-color: #dbeafe;
+  color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-size: 24px;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1);
+}
+
+.dropzone h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.dropzone p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.btn-outline {
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  background-color: transparent;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-outline:hover {
+  background-color: #eff6ff;
+}
+
+/* Input Row */
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+/* Planning Calendar Details */
+.calendar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.calendar-card .card-title {
+  margin-bottom: 0;
+}
+
+.fieldset {
+  margin-bottom: 16px;
+}
+
+.fieldset label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.date-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--text-main);
+  background: var(--bg-color);
+}
+
+.calendar-grid {
+  width: 100%;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: var(--transition);
+}
+
+.cal-day:hover:not(.empty) {
+  background-color: #f3f4f6;
+}
+
+.cal-day.empty {
+  cursor: default;
+}
+
+.cal-day.muted {
+  color: #d1d5db;
+}
+
+.cal-day.active {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+
+.cal-day.highlight {
+  background-color: #eff6ff;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.legend-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.legend-color.blue {
+  background-color: var(--primary-color);
+}
+
+.legend-color.light-blue {
+  background-color: #bfdbfe;
+}
+
+/* Table Section */
+.table-section {
+  background-color: var(--surface-color);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.table-header h2 {
+  font-size: 18px;
+}
+
+.btn-ghost {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+}
+
+.btn-ghost:hover {
+  background-color: #f3f4f6;
+  color: var(--text-main);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+}
+
+td {
+  padding: 16px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+tbody tr {
+  transition: var(--transition);
+}
+
+tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.req-id {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.style-name {
+  font-weight: 500;
+}
+
+.customer-name {
+  color: var(--text-muted);
+}
+
+.assignee {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.assignee-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.pending {
+  background-color: var(--status-pending-bg);
+  color: var(--status-pending-text);
+}
+
+.status-badge.completed {
+  background-color: var(--status-completed-bg);
+  color: var(--status-completed-text);
+}
+
+.status-badge.in-progress {
+  background-color: var(--status-inprogress-bg);
+  color: var(--status-inprogress-text);
+}
+
+.status-badge.draft {
+  background-color: var(--status-draft-bg);
+  color: var(--status-draft-text);
+}
+
+.action-btn {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+}
+
+.action-btn:hover {
+  background-color: #e5e7eb;
+  color: var(--text-main);
+}
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pagination {
+  display: flex;
+  gap: 8px;
+}
+
+.page-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: white;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #d1d5db;
+  color: var(--text-main);
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Custom Additions for Pattern Table */
+.pattern-tasks {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 1px 3px -1px rgba(0,0,0,0.02);
+  border: 1px solid var(--border-color);
+}
+
+.pattern-tasks h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.pattern-tasks .subtitle-text {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.segmented-control {
+  display: flex;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.segment {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.segment.active {
+  background-color: white;
+  color: var(--primary-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main);
+  border-color: #e5e7eb;
+  font-weight: 600;
+}
+
+.export-btn:hover {
+  background-color: #8ceabb1a; /* slight green tint */
+}
+
+/* Table Enhancements */
+.pattern-tasks table {
+  margin-top: 16px;
+}
+
+.pattern-tasks th {
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.pattern-tasks td {
+  padding: 16px 20px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f9fafb;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.pending-badge {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.success-badge {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.neutral-badge {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.danger-badge {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.inprogress-badge {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+/* Actions */
+.assign-btn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+}
+
+.assign-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+.details-link {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.details-link:hover {
+  text-decoration: underline;
+}
+
+.icon-btn-small {
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+  font-weight: bold;
+}
+
+.icon-btn-small:hover {
+  color: var(--text-main);
+}
+
+.pattern-tasks tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.pattern-due-danger {
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Table footer pagination */
+.pattern-footer-text {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* PM Assigned: full-width rows (table-like), not card tiles */
+.pattern-gallery-grid {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: #fff;
+  overflow-x: auto;
+}
+
+.pattern-gallery-row {
+  display: grid;
+  grid-template-columns:
+    minmax(88px, 1fr)
+    minmax(100px, 1.35fr)
+    minmax(90px, 1fr)
+    minmax(120px, 1.2fr)
+    minmax(88px, 0.95fr)
+    minmax(104px, 1fr)
+    minmax(88px, 1fr)
+    minmax(148px, auto);
+  gap: 12px 16px;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f9fafb;
+  font-size: 14px;
+}
+
+.pattern-gallery-row:last-child {
+  border-bottom: none;
+}
+
+.pattern-gallery-row--head {
+  background: #fafafa;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.pattern-gallery-row:not(.pattern-gallery-row--head):hover {
+  background: #f8fafc;
+}
+
+.pattern-gallery-cell {
+  min-width: 0;
+}
+
+.pattern-gallery-cell--id {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.pattern-gallery-cell--mute {
+  color: var(--text-muted);
+}
+
+.pattern-gallery-cell--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pattern-gallery-cell--pl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.pattern-gallery-row__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pattern-gallery-row__actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pattern-gallery-row__actions .btn-outline {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.pattern-gallery-row--head .pattern-gallery-row__actions {
+  text-align: center;
+}
+
+.pattern-gallery-empty {
+  padding: 48px 20px;
+  text-align: center;
+  color: #64748b;
+}
+</style>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="m4 10 8 8 8-8"></path>
+              <path d="m4 6 8-4 8 4"></path>
+            </svg>
+          </div>
+          Conso
+        </div>
+        <div class="search-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" placeholder="Search Style or Customer..." />
+        </div>
+        <div class="nav-links">
+          <a href="https://costing-home.vercel.app/">Home</a>
+          <a href="#" class="active" id="nav-conso">Pending</a>
+          <a href="#" id="nav-complete-conso">Complete</a>
+          <a href="#" id="nav-calendar">Calendar</a>
+        </div>
+      </div>
+      <div class="nav-right">
+        <button class="icon-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </button>
+        <img class="avatar" src="https://i.pravatar.cc/150?img=52" alt="User Profile" />
+      </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="main-content" style="max-width: 1440px; padding: 40px 24px;">
+
+      <!-- Page Header -->
+      <div class="page-header" style="margin-bottom: 24px;">
+        <div class="page-title">
+          <span class="subtitle" style="text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; font-size: 11px; font-weight: 700;">Production Hub</span>
+          <h1 style="margin: 4px 0;">Conso</h1>
+          <!-- Small Overview Stats -->
+          <div style="display: flex; gap: 12px; margin-top: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px; background: #ecfdf5; color: #059669; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid #d1fae5;">
+              <div style="width: 6px; height: 6px; background: #10b981; border-radius: 50%;"></div>
+              Upload Action: <span id="stat-upload-count-pill" style="font-weight: 800;">0</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; background: #f0fdf4; color: #166534; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid #bbf7d0;">
+              <div style="width: 6px; height: 6px; background: #16a34a; border-radius: 50%;"></div>
+              Complete Status: <span id="stat-complete-count-pill" style="font-weight: 800;">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <!-- Content Area -->
+        <div>
+          <div class="pattern-tasks">
+            <!-- Table Header -->
+            <div class="table-header">
+              <div>
+                <h2 id="table-header-title">Active Conso Tasks</h2>
+                <p class="subtitle-text">Managing current production conso deliverables</p>
+              </div>
+          <div class="header-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button class="btn-ghost" id="open-filter" style="display: inline-flex; align-items: center;">Filter Data</button>
+            <button class="btn-outline export-btn" id="export-excel-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export
+            </button>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Style</th>
+              <th>Customer</th>
+              <th>Assigned PL</th>
+              <th>Costing Ready Date</th>
+              <th>Status</th>
+              <th style="text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 40px;">⏳ Loading conso tasks from Google Sheets...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Footer -->
+        <div class="table-footer" style="padding-top: 16px; margin-top: 8px;">
+          <span class="pattern-footer-text">Showing 0 of 0 conso tasks</span>
+          <div class="pagination">
+            <button class="page-btn" disabled>&lt;</button>
+            <button class="page-btn">&gt;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Complete Conso Table -->
+      <div id="complete-conso-section" class="pattern-tasks" style="display: none; margin-bottom: 32px; background: white; padding: 32px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+        <div class="table-header" style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Completed Conso Tasks</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Managing current production conso deliverables</p>
+          </div>
+          <div>
+            <button class="btn-outline export-btn" style="padding: 8px 16px; font-weight: 600; border-color: #d1d5db; color: #374151; display: inline-flex; align-items: center; gap: 8px;">
+               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+               Export
+            </button>
+          </div>
+        <!-- Gallery View (Used for Complete Conso Section) -->
+        <div id="conso-complete-gallery-container" style="display: none; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 24px; width: 100%;">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Table View (Used for Complete Conso Section) -->
+        <div id="conso-complete-table-container" style="width: 100%;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Request ID</th>
+              <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Style</th>
+              <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Customer</th>
+              <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Assigned PL</th>
+              <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Costing Ready Date</th>
+              <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Status</th>
+              <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase; text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="complete-table-body">
+            <!-- Dynamic data -->
+          </tbody>
+        </table>
+        
+        <div class="table-footer" style="padding-top: 24px; margin-top: 24px; border-top: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+          <span style="color: #9ca3af; font-size: 13px;">Showing <span id="complete-count-text">0</span> patterns</span>
+          <div class="pagination" style="display: flex; gap: 8px;">
+            <button class="page-btn" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #e5e7eb; background: white; border-radius: 6px;">&lt;</button>
+            <button class="page-btn" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #e5e7eb; background: white; border-radius: 6px;">&gt;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+      <!-- Calendar View Section -->
+      <div class="calendar-section" id="calendar-section"
+        style="display: none; margin-bottom: 32px; background: white; padding: 24px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+        <div class="calendar-header"
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <button class="btn-outline" id="cal-prev-btn" style="padding: 6px 12px;">&lt; Previous</button>
+          <h2 id="cal-month-title" style="margin: 0; font-size: 20px;">Month Year</h2>
+          <button class="btn-outline" id="cal-next-btn" style="padding: 6px 12px;">Next &gt;</button>
+        </div>
+        <div
+          style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; margin-bottom: 10px; color: var(--text-muted); padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">
+          <div>Sun</div>
+          <div>Mon</div>
+          <div>Tue</div>
+          <div>Wed</div>
+          <div>Thu</div>
+          <div>Fri</div>
+          <div>Sat</div>
+        </div>
+        <div id="calendar-grid"
+          style="display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 100px; gap: 8px; text-align: left;">
+          <!-- Calendar cells rendered here via JS -->
+        </div>
+      </div> <!-- Close Calendar Section -->
+      </div><!-- Close Right Content -->
+    </div><!-- Close Flex Container -->
+    </main>
+
+    <!-- Calendar Day Requests Modal -->
+    <div class="modal" id="calendar-day-modal"
+      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+      <div class="card"
+        style="width: 400px; padding: 24px; background: white; border-radius: 8px; max-height: 80vh; overflow-y: auto;">
+        <h3 id="calendar-day-title" style="margin-bottom: 16px; border-bottom: 1px solid #ddd; padding-bottom: 8px;">
+          Assignments for Date</h3>
+        <div id="calendar-day-content" style="line-height: 1.6; font-size: 14px; margin-bottom: 24px;">
+          <!-- Populated via JS -->
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <button class="btn-secondary" id="close-calendar-day-btn" style="padding: 8px 16px;">Close</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Filter Modal (Matches Techpack/Acc) -->
+    <div class="modal" id="filter-modal"
+      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+      <div class="card" style="width: 400px; padding: 24px; background: white; border-radius: 8px;">
+        <h3 style="margin-bottom: 20px;">Advanced Filter</h3>
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">REQUEST ID</label>
+            <input type="text" id="filter-id" list="id-list-conso" class="btn-outline" style="width: 100%; text-align: left; padding: 10px;" placeholder="Search or select ID..." />
+            <datalist id="id-list-conso"></datalist>
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">STYLE NAME</label>
+            <input type="text" id="filter-style" list="style-list-conso" class="btn-outline" style="width: 100%; text-align: left; padding: 10px;" placeholder="Search or select Style..." />
+            <datalist id="style-list-conso"></datalist>
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">CUSTOMER</label>
+            <input type="text" id="filter-cust" list="cust-list-conso" class="btn-outline" style="width: 100%; text-align: left; padding: 10px;" placeholder="Search or select Customer..." />
+            <datalist id="cust-list-conso"></datalist>
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">PL NAME</label>
+            <input type="text" id="filter-pl" list="pl-list-conso" class="btn-outline" style="width: 100%; text-align: left; padding: 10px;" placeholder="Search or select PL..." />
+            <datalist id="pl-list-conso"></datalist>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <button class="btn-secondary" id="close-filter-btn" style="padding: 8px 16px;">Cancel</button>
+          <button class="btn-primary" id="apply-filter-btn" style="padding: 8px 16px;">Apply Filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal" id="details-modal"
+      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+      <div class="card"
+        style="width: 500px; padding: 24px; background: white; border-radius: 8px; max-height: 80vh; overflow-y: auto;">
+        <h3 style="margin-bottom: 16px; border-bottom: 1px solid #ddd; padding-bottom: 8px;">Request Details</h3>
+        <div id="details-content" style="line-height: 1.6; font-size: 14px; margin-bottom: 24px;">
+          <!-- Populated via JS -->
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <button class="btn-secondary" id="close-details-btn" style="padding: 8px 16px;">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Remarks & Status Lead Modal -->
+    <div class="modal" id="remarks-modal"
+      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+      <div class="card"
+        style="width: 550px; padding: 24px; background: white; border-radius: 12px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);">
+        <h3 style="margin-bottom: 16px; border-bottom: 1px solid #f3f4f6; padding-bottom: 12px; color: var(--primary-color);">Revert / Update Status</h3>
+        <p style="margin-bottom: 20px; font-size: 14px; color: #6b7280;">Request ID: <strong id="remarks-req-id"
+            style="color: #1f2937;">-</strong></p>
+
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; margin-bottom: 10px; font-weight: 600; font-size: 14px; color: #374151;">Remarks / Comments</label>
+          <textarea id="remarks-textarea" rows="5" placeholder="Enter any notes before transitioning..."
+            style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; font-family: inherit; resize: vertical; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='#d1d5db'"></textarea>
+        </div>
+
+        <div id="remarks-status-msg" style="font-size: 13px; color: #059669; margin-bottom: 16px; display: none; font-weight: 500;">✓ Saved</div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <p style="font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 4px;">Select Next Status:</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <button class="btn-primary lead-status-btn" data-status="Awaiting Meeting" style="background-color: #6366f1; font-size: 12px; padding: 10px 4px;">Awaiting Meeting</button>
+            <button class="btn-primary lead-status-btn" data-status="Awaiting Techpack" style="background-color: #f59e0b; font-size: 12px; padding: 10px 4px;">Awaiting Techpack</button>
+            <button class="btn-primary lead-status-btn" data-status="Awaiting Pattern" style="background-color: #10b981; font-size: 12px; padding: 10px 4px;">Awaiting Pattern</button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f3f4f6;">
+          <button class="btn-secondary" id="close-remarks-btn" style="padding: 8px 20px;">Close / Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzSdyx3uNKZPhbhwg_eIc_VmRTvUNF8-Q5z9hunbr7seSuz2nNdO-awDI8qserEQHkr/exec';
+
+  let allRequests = [];
+  let currentTab = 'AWAITING CONSO';
+  let advFilter = { id: '', style: '', customer: '', pl: '' };
+  let calCurrentDate = new Date();
+
+  const normalizeStatus = (s) => String(s || '').toUpperCase().replace(/\s+/g, ' ').trim();
+
+  async function loadConsoTasks() {
+    try {
+      const response = await fetch(`${GOOGLE_SCRIPT_URL}?t=${new Date().getTime()}`);
+      if (!response.ok) throw new Error(`Network response was not ok: ${response.status}`);
+      const data = await response.json();
+      allRequests = data;
+      populateDatalists();
+      renderAll();
+    } catch (error) {
+      console.error('Failed to load data:', error);
+      const tableBody = document.getElementById('table-body');
+      if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #dc2626; padding: 40px;">❌ Failed to load data: <b>${error.message}</b></td></tr>`;
+      }
+    }
+  }
+
+  function populateDatalists() {
+    const ids = [...new Set(allRequests.map(r => r.id).filter(Boolean))];
+    const styles = [...new Set(allRequests.map(r => r.style || r.Style).filter(Boolean))];
+    const customers = [...new Set(allRequests.map(r => r.customer || r.Customer).filter(Boolean))];
+    const pls = [...new Set(allRequests.map(r => r.assignee || r.PL_Name).filter(Boolean))];
+
+    const fills = [
+      { id: 'id-list-conso', vals: ids },
+      { id: 'style-list-conso', vals: styles },
+      { id: 'cust-list-conso', vals: customers },
+      { id: 'pl-list-conso', vals: pls }
+    ];
+
+    fills.forEach(f => {
+      const el = document.getElementById(f.id);
+      if (el) el.innerHTML = f.vals.map(v => `<option value="${v}">`).join('');
+    });
+  }
+
+  function renderAll() {
+    if (currentTab === 'AWAITING CONSO') {
+      renderTable();
+    } else if (currentTab === 'COMPLETE CONSO') {
+      renderCompleteConsoTable();
+    } else if (currentTab === 'CALENDAR') {
+      renderCalendar();
+    }
+  }
+
+  function updateStats() {
+    const uploadCount = allRequests.filter(r => normalizeStatus(r.status) === 'AWAITING CONSO').length;
+    const completeCount = allRequests.filter(r => normalizeStatus(r.status) === 'COMPLETE CONSO').length;
+    
+    const uploadPillEl = document.getElementById('stat-upload-count-pill');
+    if (uploadPillEl) uploadPillEl.textContent = uploadCount;
+
+    const completePillEl = document.getElementById('stat-complete-count-pill');
+    if (completePillEl) completePillEl.textContent = completeCount;
+  }
+
+  function renderTable() {
+    updateStats();
+    const tableBody = document.getElementById('table-body');
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+
+    const filtered = allRequests.filter(row => {
+      if (normalizeStatus(row.status) !== 'AWAITING CONSO') return false;
+
+      if (advFilter.id && !(row.id || '').toLowerCase().includes(advFilter.id.toLowerCase())) return false;
+      if (advFilter.style && !(row.style || row.Style || '').toLowerCase().includes(advFilter.style.toLowerCase())) return false;
+      if (advFilter.customer && !(row.customer || row.Customer || '').toLowerCase().includes(advFilter.customer.toLowerCase())) return false;
+      if (advFilter.pl && !(row.assignee || row.PL_Name || '').toLowerCase().includes(advFilter.pl.toLowerCase())) return false;
+
+      return true;
+    });
+
+    const footerEl = document.querySelector('.pattern-footer-text');
+    if (footerEl) footerEl.textContent = `Showing ${filtered.length} conso tasks`;
+
+    if (filtered.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px; color: #6b7280;">No active conso tasks found.</td></tr>`;
+      return;
+    }
+
+    filtered.forEach((row, index) => {
+      const safeId = row.id || `REQ-${index + 1}`;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="req-id" style="color: var(--primary-color); font-weight: 600;">${safeId}</td>
+        <td style="font-weight: 500;">${row.style || row.Style || '-'}</td>
+        <td style="color: var(--text-muted);">${row.customer || row.Customer || '-'}</td>
+        <td>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="https://i.pravatar.cc/150?u=${encodeURIComponent(safeId)}" style="width: 24px; height: 24px; border-radius: 50%;" />
+            ${row.assignee || row.PL_Name || 'Unassigned'}
+          </div>
+        </td>
+        <td>${row.createdDate || row.Costing_Ready_Date || '-'}</td>
+        <td><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">AWAITING CONSO</span></td>
+        <td style="text-align: center;">
+          <div style="display: flex; justify-content: center; gap: 8px; align-items: center;">
+            <button class="btn-outline upload-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Upload</button>
+            <button class="btn-outline remarks-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Revert Back</button>
+          </div>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+    tableBody.querySelectorAll('.upload-btn').forEach(btn => btn.addEventListener('click', () => handleUpload(btn.dataset.id)));
+    tableBody.querySelectorAll('.remarks-btn').forEach(btn => btn.addEventListener('click', () => openRemarks(btn.dataset.id)));
+  }
+
+  function renderCompleteConsoTable() {
+    updateStats();
+    const completeBody = document.getElementById('complete-table-body');
+    if (!completeBody) return;
+    completeBody.innerHTML = '';
+
+    const filtered = allRequests.filter(row => {
+      if (normalizeStatus(row.status) !== 'COMPLETE CONSO') return false;
+      if (advFilter.id && !(row.id || '').toLowerCase().includes(advFilter.id.toLowerCase())) return false;
+      if (advFilter.style && !(row.style || row.Style || '').toLowerCase().includes(advFilter.style.toLowerCase())) return false;
+      return true;
+    });
+
+    const countEl = document.getElementById('complete-count-text');
+    if (countEl) countEl.textContent = filtered.length;
+
+    if (filtered.length === 0) {
+      completeBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">No completed conso tasks found.</td></tr>`;
+      return;
+    }
+
+    filtered.forEach((row, index) => {
+      const safeId = row.id || `REQ-${index + 1}`;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="padding: 16px 0; color: var(--primary-color); font-weight: 600;">${safeId}</td>
+        <td style="padding: 16px 0; font-weight: 500;">${row.style || row.Style || '-'}</td>
+        <td style="padding: 16px 0; color: var(--text-muted);">${row.customer || row.Customer || '-'}</td>
+        <td style="padding: 16px 0;">
+           <div style="display: flex; align-items: center; gap: 8px;">
+             <img src="https://i.pravatar.cc/150?u=${encodeURIComponent(safeId)}" style="width: 24px; height: 24px; border-radius: 50%;" />
+             ${row.assignee || row.PL_Name || 'Unassigned'}
+           </div>
+        </td>
+        <td style="padding: 16px 0;">${row.createdDate || row.Costing_Ready_Date || '-'}</td>
+        <td style="padding: 16px 0;"><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">COMPLETE CONSO</span></td>
+        <td style="padding: 16px 0; text-align: center;">
+          <div style="display: flex; justify-content: center; gap: 6px;">
+            <button class="folder-btn" data-id="${safeId}" title="Folder" style="padding: 6px; border-radius: 6px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </button>
+            <button class="remarks-btn" data-id="${safeId}" title="Revert Status" style="padding: 6px; border-radius: 6px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </button>
+            <button class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Details</button>
+          </div>
+        </td>
+      `;
+      completeBody.appendChild(tr);
+    });
+
+    completeBody.querySelectorAll('.folder-btn').forEach(btn => btn.addEventListener('click', () => openFolder(btn.dataset.id)));
+    completeBody.querySelectorAll('.remarks-btn').forEach(btn => btn.addEventListener('click', () => openRemarks(btn.dataset.id)));
+    completeBody.querySelectorAll('.details-btn').forEach(btn => btn.addEventListener('click', () => showDetails(btn.dataset.id)));
+  }
+
+  function openFolder(id) {
+    const row = allRequests.find(r => r.id === id);
+    const link = row ? (row.folderLink || row.folder_link || '') : '';
+    if (link.startsWith('http')) window.open(link, '_blank');
+    else alert('No folder link available.');
+  }
+
+  async function handleUpload(id) {
+    const row = allRequests.find(r => r.id === id);
+    const link = row ? (row.folderLink || row.folder_link || '') : '';
+    if (link.startsWith('http')) window.open(link, '_blank');
+    else { alert('No folder link available.'); return; }
+
+    if (confirm(`Mark ${id} as Complete Conso?`)) {
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          // Backend now supports Conso statuses on Techpack endpoint.
+          body: JSON.stringify({
+            requestId: id,
+            status: 'COMPLETE CONSO',
+            Status: 'COMPLETE CONSO',
+            action: '', // keep empty to remain Techpack-routed
+            timestamp: new Date().toISOString()
+          })
+        });
+        if (row) row.status = 'COMPLETE CONSO';
+        // Refresh from backend so counts/tables match the sheet state.
+        await loadConsoTasks();
+        document.getElementById('nav-complete-conso').click();
+      } catch (err) { console.error(err); alert('Update failed'); }
+    }
+  }
+
+  function showDetails(id) {
+    const row = allRequests.find(r => r.id === id);
+    if (!row) return;
+    const content = document.getElementById('details-content');
+    const fields = [
+      { label: 'Request ID', value: row.id },
+      { label: 'Style', value: row.style || row.Style },
+      { label: 'Customer', value: row.customer || row.Customer },
+      { label: 'Status', value: row.status || row.Status },
+      { label: 'Folder Path', value: row.folderLink || row.folder_link, isLink: true }
+    ];
+    content.innerHTML = fields.map(f => `
+      <div style="display:flex; justify-content:space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+        <strong style="color: #64748b;">${f.label}</strong>
+        <span>${f.isLink ? `<a href="${f.value}" target="_blank" style="color: var(--primary-color);">Open Link</a>` : (f.value || '-')}</span>
+      </div>
+    `).join('');
+    document.getElementById('details-modal').style.display = 'flex';
+  }
+
+  function openRemarks(id) {
+    const idEl = document.getElementById('remarks-req-id');
+    if (idEl) idEl.textContent = id;
+    document.getElementById('remarks-modal').style.display = 'flex';
+  }
+
+  // --- Revert / Update Status modal logic ---
+  // Keeps the same variable names used across the project.
+  let currentRemarksReqId = null;
+  const remarksModalEl = document.getElementById('remarks-modal');
+  const remarksTextareaEl = document.getElementById('remarks-textarea');
+  const remarksStatusMsgEl = document.getElementById('remarks-status-msg');
+
+  // Capture current id when opening modal (from any button)
+  const _openRemarksOriginal = openRemarks;
+  openRemarks = function (id) {
+    currentRemarksReqId = id;
+    if (remarksStatusMsgEl) {
+      remarksStatusMsgEl.style.display = 'none';
+      remarksStatusMsgEl.textContent = '✓ Saved';
+    }
+    _openRemarksOriginal(id);
+    if (remarksTextareaEl) setTimeout(() => remarksTextareaEl.focus(), 0);
+  };
+
+  function normalizeTargetStatus_(s) {
+    return String(s || '').trim();
+  }
+
+  async function saveConsoStatusChange_(nextStatus) {
+    if (!currentRemarksReqId) {
+      alert('No request selected.');
+      return;
+    }
+    const st = normalizeTargetStatus_(nextStatus);
+    if (!st) return;
+
+    const notes = remarksTextareaEl ? remarksTextareaEl.value.trim() : '';
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestId: currentRemarksReqId,
+          status: st,
+          Status: st,
+          remarks: notes,
+          Remarks: notes,
+          action: '', // keep empty: handled by unified Techpack/Conso route in backend
+          timestamp: new Date().toISOString()
+        })
+      });
+
+      // Optimistic UI update
+      const row = allRequests.find(r => r && (r.id === currentRemarksReqId));
+      if (row) {
+        row.status = st;
+        row.Status = st;
+        if (notes) row.Remarks = notes;
+      }
+
+      if (remarksStatusMsgEl) {
+        remarksStatusMsgEl.style.display = 'block';
+        remarksStatusMsgEl.textContent = '✓ Saved (refreshing…)';
+      }
+      if (remarksModalEl) remarksModalEl.style.display = 'none';
+
+      // Refresh to confirm sheet state (no-cors prevents reading response)
+      loadConsoTasks();
+    } catch (err) {
+      console.error(err);
+      alert('Update failed. Please try again.');
+    }
+  }
+
+  // Bind status buttons in modal
+  document.querySelectorAll('.lead-status-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const st = btn.getAttribute('data-status');
+      saveConsoStatusChange_(st);
+    });
+  });
+
+  // --- Filter Modal Bindings ---
+  document.getElementById('open-filter').addEventListener('click', () => document.getElementById('filter-modal').style.display = 'flex');
+  document.getElementById('close-filter-btn').addEventListener('click', () => document.getElementById('filter-modal').style.display = 'none');
+  document.getElementById('apply-filter-btn').addEventListener('click', () => {
+    advFilter.id = document.getElementById('filter-id').value.trim();
+    advFilter.style = document.getElementById('filter-style').value.trim();
+    advFilter.customer = document.getElementById('filter-cust').value.trim();
+    advFilter.pl = document.getElementById('filter-pl').value.trim();
+    renderAll();
+    document.getElementById('filter-modal').style.display = 'none';
+  });
+
+  function renderAll() {
+    updateStats();
+    if (currentTab === 'CALENDAR') {
+      document.querySelector('.pattern-tasks').style.display = 'none';
+      document.getElementById('complete-conso-section').style.display = 'none';
+      document.getElementById('calendar-section').style.display = 'block';
+      renderCalendar();
+      return;
+    }
+
+    document.getElementById('calendar-section').style.display = 'none';
+
+    if (currentTab === 'COMPLETE CONSO') {
+      document.querySelector('.pattern-tasks').style.display = 'none';
+      document.getElementById('complete-conso-section').style.display = 'block';
+      
+      const tableContainer = document.getElementById('conso-complete-table-container');
+      const galleryContainer = document.getElementById('conso-complete-gallery-container');
+      
+      if (tableContainer && galleryContainer) {
+        tableContainer.style.display = 'none';
+        galleryContainer.style.display = 'grid';
+        renderGallery();
+      }
+    } else {
+      document.querySelector('.pattern-tasks').style.display = 'block';
+      document.getElementById('complete-conso-section').style.display = 'none';
+      renderTable();
+    }
+  }
+
+  function renderGallery() {
+    const gallery = document.getElementById('conso-complete-gallery-container');
+    gallery.innerHTML = '';
+    
+    const filtered = allRequests.filter(row => normalizeStatus(row.status) === 'COMPLETE CONSO');
+    
+    if (filtered.length === 0) {
+      gallery.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #64748b;">No completed conso tasks found.</div>';
+      return;
+    }
+
+    filtered.forEach((row, index) => {
+      const safeId = row.id || `REQ-${index + 1}`;
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.padding = '20px';
+      card.style.display = 'flex'; card.style.flexDirection = 'column'; card.style.gap = '16px';
+      card.style.transition = 'transform 0.2s, box-shadow 0.2s';
+      card.style.border = '1px solid #e2e8f0'; card.style.background = '#ffffff';
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Request ID</div>
+            <div style="font-weight: 700; color: var(--primary-color); font-size: 16px;">${safeId}</div>
+          </div>
+          <span class="status-badge success-badge" style="font-size: 10px; background: #f0fdf4; color: #16a34a; padding: 4px 10px; border-radius: 12px; font-weight: 700;">COMPLETE</span>
+        </div>
+
+        <div style="flex: 1;">
+          <div style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px;">${row.style || row.Style || 'No Style Name'}</div>
+          <div style="color: #64748b; font-size: 13px;">${row.customer || 'No Customer'}</div>
+        </div>
+
+        <div style="padding-top: 16px; border-top: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+           <div style="display: flex; align-items: center; gap: 8px;">
+             <img src="https://i.pravatar.cc/150?u=${encodeURIComponent(safeId)}" style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #e2e8f0;" />
+             <div style="font-size: 12px; font-weight: 600; color: #475569;">${row.assignee || row.PL_Name || 'Unassigned'}</div>
+           </div>
+           <div style="font-size: 11px; font-weight: 600; color: #94a3b8;">${row.Costing_Ready_Date || '-'}</div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 4px;">
+          <button class="btn-outline upload-btn" data-id="${safeId}" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center;">Upload</button>
+          <button class="btn-outline revert-btn" data-id="${safeId}" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center;">Revert Back</button>
+        </div>
+      `;
+
+      card.addEventListener('mouseenter', () => { card.style.transform = 'translateY(-4px)'; card.style.boxShadow = '0 12px 20px -8px rgba(0,0,0,0.1)'; });
+      card.addEventListener('mouseleave', () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = 'none'; });
+
+      gallery.appendChild(card);
+    });
+
+    // Gallery actions: only Upload + Revert Back
+    gallery.querySelectorAll('.upload-btn').forEach(btn => btn.addEventListener('click', (e) => openFolder(e.currentTarget.dataset.id)));
+    gallery.querySelectorAll('.revert-btn').forEach(btn => btn.addEventListener('click', (e) => openRemarks(e.currentTarget.dataset.id)));
+  }
+  document.getElementById('nav-calendar').addEventListener('click', (e) => {
+    e.preventDefault(); currentTab = 'CALENDAR';
+    setActiveTab('nav-calendar');
+    document.querySelector('.pattern-tasks').style.display = 'none';
+    document.getElementById('complete-conso-section').style.display = 'none';
+    document.getElementById('calendar-section').style.display = 'block';
+    renderAll();
+  });
+
+  function setActiveTab(id) {
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // --- Calendar ---
+  function renderCalendar() {
+    const grid = document.getElementById('calendar-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const year = calCurrentDate.getFullYear();
+    const month = calCurrentDate.getMonth();
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    document.getElementById('cal-month-title').textContent = `${monthNames[month]} ${year}`;
+    
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    
+    // Calendar implementation logic...
+    for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
+    for(let i=1; i<=lastDay; i++) {
+       const cell = document.createElement('div');
+       cell.style.border = '1px solid #eee'; cell.style.padding = '8px';
+       cell.innerHTML = `<strong>${i}</strong>`;
+       grid.appendChild(cell);
+    }
+  }
+
+  // --- Modals ---
+  document.getElementById('close-details-btn').addEventListener('click', () => document.getElementById('details-modal').style.display = 'none');
+  document.getElementById('close-remarks-btn').addEventListener('click', () => document.getElementById('remarks-modal').style.display = 'none');
+
+  loadConsoTasks();
+});
+
+    </script>
+</body>
+
+</html>
+
