@@ -1565,33 +1565,38 @@ tbody tr:hover {
   async function handleUpload(id) {
     const row = allRequests.find(r => r.id === id);
     const link = row ? (row.folderLink || row.folder_link || '') : '';
-    if (link.startsWith('http')) window.open(link, '_blank');
-    else { alert('No folder link available.'); return; }
+    if (link.startsWith('http')) {
+      window.open(link, '_blank');
+    } else {
+      alert('No folder link available. Please ensure a folder path is assigned before uploading.');
+      return;
+    }
 
-    if (confirm(`Mark ${id} as Completed (CADS uploaded)?`)) {
-      try {
-        const nowIso = new Date().toISOString();
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            requestId: id,
-            status: 'Completed',
-            Status: 'Completed',
-            Cads_Uploaded_Date: nowIso,
-            action: '',
-            timestamp: nowIso
-          })
-        });
-        if (row) {
-          row.status = 'Completed';
-          row.Status = 'Completed';
-          row.Cads_Uploaded_Date = nowIso;
-        }
-        // Refresh from backend so counts/tables match the sheet state.
-        await loadConsoTasks();
-        document.getElementById('nav-complete-conso').click();
-      } catch (err) { console.error(err); alert('Update failed'); }
+    try {
+      const nowIso = new Date().toISOString();
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestId: id,
+          status: 'Completed',
+          Status: 'Completed',
+          Cads_Uploaded_Date: nowIso,
+          action: '',
+          timestamp: nowIso
+        })
+      });
+      if (row) {
+        row.status = 'Completed';
+        row.Status = 'Completed';
+        row.Cads_Uploaded_Date = nowIso;
+      }
+      // Refresh from backend so counts/tables match the sheet state.
+      await loadConsoTasks();
+      document.getElementById('nav-complete-conso').click();
+    } catch (err) { 
+      console.error(err); 
+      alert('Update failed'); 
     }
   }
 
