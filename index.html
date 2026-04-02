@@ -1629,6 +1629,7 @@ tbody tr:hover {
       { label: 'Customer', value: row.customer || row.Customer },
       { label: 'Status', value: row.status || row.Status },
       { label: 'CADS uploaded', value: row.Cads_Uploaded_Date },
+      { label: 'Remarks', value: row.Remarks || row.remarks },
       { label: 'Folder Path', value: row.folderLink || row.folder_link, isLink: true }
     ];
     content.innerHTML = fields.map(f => `
