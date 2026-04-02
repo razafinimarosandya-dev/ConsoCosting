@@ -1209,8 +1209,8 @@ tbody tr:hover {
       <div id="complete-conso-section" class="pattern-tasks" style="display: none; margin-bottom: 32px; background: white; padding: 32px; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
         <div class="table-header" style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px;">
           <div>
-            <h2 style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Completed Conso Tasks</h2>
-            <p style="color: var(--text-muted); font-size: 14px;">Managing current production conso deliverables</p>
+            <h2 style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Completed (CADS)</h2>
+            <p style="color: var(--text-muted); font-size: 14px;">Rows with status Completed and CADS upload date</p>
           </div>
           <div>
             <button class="btn-outline export-btn" style="padding: 8px 16px; font-weight: 600; border-color: #d1d5db; color: #374151; display: inline-flex; align-items: center; gap: 8px;">
@@ -1218,6 +1218,7 @@ tbody tr:hover {
                Export
             </button>
           </div>
+        </div>
         <!-- Gallery View (Used for Complete Conso Section) -->
         <div id="conso-complete-gallery-container" style="display: none; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 24px; width: 100%;">
           <!-- Rendered via JS -->
@@ -1232,7 +1233,7 @@ tbody tr:hover {
               <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Style</th>
               <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Customer</th>
               <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Assigned PL</th>
-              <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Costing Ready Date</th>
+              <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">CADS uploaded</th>
               <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase;">Status</th>
               <th style="padding-bottom: 16px; color: #6b7280; font-size: 11px; font-weight: 800; text-transform: uppercase; text-align: center;">Action</th>
             </tr>
@@ -1392,6 +1393,11 @@ tbody tr:hover {
 
   const normalizeStatus = (s) => String(s || '').toUpperCase().replace(/\s+/g, ' ').trim();
 
+  function isCadsCompletedStatus(statusRaw) {
+    const n = normalizeStatus(statusRaw);
+    return n === 'COMPLETED';
+  }
+
   async function loadConsoTasks() {
     try {
       const response = await fetch(`${GOOGLE_SCRIPT_URL}?t=${new Date().getTime()}`);
@@ -1428,19 +1434,9 @@ tbody tr:hover {
     });
   }
 
-  function renderAll() {
-    if (currentTab === 'AWAITING CONSO') {
-      renderTable();
-    } else if (currentTab === 'COMPLETE CONSO') {
-      renderCompleteConsoTable();
-    } else if (currentTab === 'CALENDAR') {
-      renderCalendar();
-    }
-  }
-
   function updateStats() {
     const uploadCount = allRequests.filter(r => normalizeStatus(r.status) === 'AWAITING CONSO').length;
-    const completeCount = allRequests.filter(r => normalizeStatus(r.status) === 'COMPLETE CONSO').length;
+    const completeCount = allRequests.filter(r => isCadsCompletedStatus(r.status)).length;
     
     const uploadPillEl = document.getElementById('stat-upload-count-pill');
     if (uploadPillEl) uploadPillEl.textContent = uploadCount;
@@ -1510,7 +1506,7 @@ tbody tr:hover {
     completeBody.innerHTML = '';
 
     const filtered = allRequests.filter(row => {
-      if (normalizeStatus(row.status) !== 'COMPLETE CONSO') return false;
+      if (!isCadsCompletedStatus(row.status)) return false;
       if (advFilter.id && !(row.id || '').toLowerCase().includes(advFilter.id.toLowerCase())) return false;
       if (advFilter.style && !(row.style || row.Style || '').toLowerCase().includes(advFilter.style.toLowerCase())) return false;
       return true;
@@ -1537,8 +1533,8 @@ tbody tr:hover {
              ${row.assignee || row.PL_Name || 'Unassigned'}
            </div>
         </td>
-        <td style="padding: 16px 0;">${row.createdDate || row.Costing_Ready_Date || '-'}</td>
-        <td style="padding: 16px 0;"><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">COMPLETE CONSO</span></td>
+        <td style="padding: 16px 0;">${row.Cads_Uploaded_Date || row.createdDate || row.Costing_Ready_Date || '-'}</td>
+        <td style="padding: 16px 0;"><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">Completed</span></td>
         <td style="padding: 16px 0; text-align: center;">
           <div style="display: flex; justify-content: center; gap: 6px;">
             <button class="folder-btn" data-id="${safeId}" title="Folder" style="padding: 6px; border-radius: 6px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; cursor: pointer;">
@@ -1572,21 +1568,26 @@ tbody tr:hover {
     if (link.startsWith('http')) window.open(link, '_blank');
     else { alert('No folder link available.'); return; }
 
-    if (confirm(`Mark ${id} as Complete Conso?`)) {
+    if (confirm(`Mark ${id} as Completed (CADS uploaded)?`)) {
       try {
+        const nowIso = new Date().toISOString();
         await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST', mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          // Backend now supports Conso statuses on Techpack endpoint.
           body: JSON.stringify({
             requestId: id,
-            status: 'COMPLETE CONSO',
-            Status: 'COMPLETE CONSO',
-            action: '', // keep empty to remain Techpack-routed
-            timestamp: new Date().toISOString()
+            status: 'Completed',
+            Status: 'Completed',
+            Cads_Uploaded_Date: nowIso,
+            action: '',
+            timestamp: nowIso
           })
         });
-        if (row) row.status = 'COMPLETE CONSO';
+        if (row) {
+          row.status = 'Completed';
+          row.Status = 'Completed';
+          row.Cads_Uploaded_Date = nowIso;
+        }
         // Refresh from backend so counts/tables match the sheet state.
         await loadConsoTasks();
         document.getElementById('nav-complete-conso').click();
@@ -1603,6 +1604,7 @@ tbody tr:hover {
       { label: 'Style', value: row.style || row.Style },
       { label: 'Customer', value: row.customer || row.Customer },
       { label: 'Status', value: row.status || row.Status },
+      { label: 'CADS uploaded', value: row.Cads_Uploaded_Date },
       { label: 'Folder Path', value: row.folderLink || row.folder_link, isLink: true }
     ];
     content.innerHTML = fields.map(f => `
@@ -1723,7 +1725,7 @@ tbody tr:hover {
 
     document.getElementById('calendar-section').style.display = 'none';
 
-    if (currentTab === 'COMPLETE CONSO') {
+    if (currentTab === 'COMPLETED') {
       document.querySelector('.pattern-tasks').style.display = 'none';
       document.getElementById('complete-conso-section').style.display = 'block';
       
@@ -1744,64 +1746,108 @@ tbody tr:hover {
 
   function renderGallery() {
     const gallery = document.getElementById('conso-complete-gallery-container');
+    if (!gallery) return;
     gallery.innerHTML = '';
     
-    const filtered = allRequests.filter(row => normalizeStatus(row.status) === 'COMPLETE CONSO');
+    // Add grid class to match index 4.html layout
+    gallery.className = 'pattern-gallery-grid';
+    // Reset any grid-template-columns inline style left over from old design
+    gallery.style.gridTemplateColumns = '';
+    gallery.style.gap = '';
+    gallery.style.display = 'flex'; // it is flex-direction: column in CSS
+
+    const filtered = allRequests.filter(row => isCadsCompletedStatus(row.status));
     
+    const footerLabel = document.querySelector('.pattern-footer-text');
+    if (footerLabel) footerLabel.textContent = `Showing ${filtered.length} tasks`;
+
     if (filtered.length === 0) {
-      gallery.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #64748b;">No completed conso tasks found.</div>';
+      gallery.innerHTML = '<div class="pattern-gallery-empty">No completed tasks found.</div>';
       return;
     }
 
+    const head = document.createElement('div');
+    head.className = 'pattern-gallery-row pattern-gallery-row--head';
+    head.innerHTML = `
+      <span>Request ID</span>
+      <span>Style</span>
+      <span>Customer</span>
+      <span>Assigned PL</span>
+      <span>CADS Uploaded</span>
+      <span>Status</span>
+      <span>Action</span>
+    `;
+    // We adjust grid-template-columns since we have 7 elements instead of 8 in index 4
+    head.style.gridTemplateColumns = 'minmax(88px, 1fr) minmax(100px, 1.35fr) minmax(90px, 1fr) minmax(120px, 1.2fr) minmax(104px, 1fr) minmax(88px, 1fr) minmax(148px, auto)';
+    gallery.appendChild(head);
+
     filtered.forEach((row, index) => {
       const safeId = row.id || `REQ-${index + 1}`;
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.style.padding = '20px';
-      card.style.display = 'flex'; card.style.flexDirection = 'column'; card.style.gap = '16px';
-      card.style.transition = 'transform 0.2s, box-shadow 0.2s';
-      card.style.border = '1px solid #e2e8f0'; card.style.background = '#ffffff';
+      const line = document.createElement('div');
+      line.className = 'pattern-gallery-row';
+      line.style.gridTemplateColumns = 'minmax(88px, 1fr) minmax(100px, 1.35fr) minmax(90px, 1fr) minmax(120px, 1.2fr) minmax(104px, 1fr) minmax(88px, 1fr) minmax(148px, auto)';
 
-      card.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div>
-            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">Request ID</div>
-            <div style="font-weight: 700; color: var(--primary-color); font-size: 16px;">${safeId}</div>
+      const styleDisp = row.style || row.Style || '-';
+      const customerDisp = row.customer || row.Customer || '-';
+      const plDisp = row.assignee || 'Unassigned';
+      const cadsDisp = row.Cads_Uploaded_Date || row.Costing_Ready_Date || '-';
+      const statusDisp = row.status || 'COMPLETED';
+      const av = row.avatar || 'https://i.pravatar.cc/150?u=' + encodeURIComponent(safeId);
+
+      line.innerHTML = `
+        <span class="pattern-gallery-cell pattern-gallery-cell--id">${safeId}</span>
+        <span class="pattern-gallery-cell pattern-gallery-cell--truncate">${styleDisp}</span>
+        <span class="pattern-gallery-cell pattern-gallery-cell--mute pattern-gallery-cell--truncate">${customerDisp}</span>
+        <span class="pattern-gallery-cell pattern-gallery-cell--pl">
+          <img class="pattern-gallery-row__avatar" src="${av}" alt="" />
+          <span class="pattern-gallery-cell--truncate">${plDisp}</span>
+        </span>
+        <span class="pattern-gallery-cell">${cadsDisp}</span>
+        <span class="pattern-gallery-cell"><span class="status-badge success-badge">Completed</span></span>
+        <span class="pattern-gallery-row__actions">
+          <div style="display: flex; justify-content: center; gap: 6px;">
+            <button type="button" class="folder-btn" data-id="${safeId}" style="padding: 6px; border-radius: 6px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </button>
+            <button type="button" class="remarks-btn" data-id="${safeId}" style="padding: 6px; border-radius: 6px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </button>
+            <button type="button" class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Details</button>
           </div>
-          <span class="status-badge success-badge" style="font-size: 10px; background: #f0fdf4; color: #16a34a; padding: 4px 10px; border-radius: 12px; font-weight: 700;">COMPLETE</span>
-        </div>
-
-        <div style="flex: 1;">
-          <div style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px;">${row.style || row.Style || 'No Style Name'}</div>
-          <div style="color: #64748b; font-size: 13px;">${row.customer || 'No Customer'}</div>
-        </div>
-
-        <div style="padding-top: 16px; border-top: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
-           <div style="display: flex; align-items: center; gap: 8px;">
-             <img src="https://i.pravatar.cc/150?u=${encodeURIComponent(safeId)}" style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #e2e8f0;" />
-             <div style="font-size: 12px; font-weight: 600; color: #475569;">${row.assignee || row.PL_Name || 'Unassigned'}</div>
-           </div>
-           <div style="font-size: 11px; font-weight: 600; color: #94a3b8;">${row.Costing_Ready_Date || '-'}</div>
-        </div>
-
-        <div style="display: flex; gap: 8px; margin-top: 4px;">
-          <button class="btn-outline upload-btn" data-id="${safeId}" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center;">Upload</button>
-          <button class="btn-outline revert-btn" data-id="${safeId}" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center;">Revert Back</button>
-        </div>
+        </span>
       `;
 
-      card.addEventListener('mouseenter', () => { card.style.transform = 'translateY(-4px)'; card.style.boxShadow = '0 12px 20px -8px rgba(0,0,0,0.1)'; });
-      card.addEventListener('mouseleave', () => { card.style.transform = 'translateY(0)'; card.style.boxShadow = 'none'; });
-
-      gallery.appendChild(card);
+      gallery.appendChild(line);
     });
 
-    // Gallery actions: only Upload + Revert Back
-    gallery.querySelectorAll('.upload-btn').forEach(btn => btn.addEventListener('click', (e) => openFolder(e.currentTarget.dataset.id)));
-    gallery.querySelectorAll('.revert-btn').forEach(btn => btn.addEventListener('click', (e) => openRemarks(e.currentTarget.dataset.id)));
+    // Reattach event listeners using the same ones previously attached
+    gallery.querySelectorAll('.folder-btn').forEach(btn => btn.addEventListener('click', (e) => openFolder(e.currentTarget.dataset.id)));
+    gallery.querySelectorAll('.remarks-btn').forEach(btn => btn.addEventListener('click', (e) => openRemarks(e.currentTarget.dataset.id)));
+    gallery.querySelectorAll('.details-btn').forEach(btn => btn.addEventListener('click', (e) => showDetails(e.currentTarget.dataset.id)));
   }
+
+  function setActiveTab(id) {
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  document.getElementById('nav-conso').addEventListener('click', (e) => {
+    e.preventDefault();
+    currentTab = 'AWAITING CONSO';
+    setActiveTab('nav-conso');
+    renderAll();
+  });
+
+  document.getElementById('nav-complete-conso').addEventListener('click', (e) => {
+    e.preventDefault();
+    currentTab = 'COMPLETED';
+    setActiveTab('nav-complete-conso');
+    renderAll();
+  });
+
   document.getElementById('nav-calendar').addEventListener('click', (e) => {
-    e.preventDefault(); currentTab = 'CALENDAR';
+    e.preventDefault();
+    currentTab = 'CALENDAR';
     setActiveTab('nav-calendar');
     document.querySelector('.pattern-tasks').style.display = 'none';
     document.getElementById('complete-conso-section').style.display = 'none';
@@ -1809,33 +1855,149 @@ tbody tr:hover {
     renderAll();
   });
 
-  function setActiveTab(id) {
-    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-
-  // --- Calendar ---
+  // --- Calendar (Completed CADS, anchored on Cads_Uploaded_Date) ---
   function renderCalendar() {
     const grid = document.getElementById('calendar-grid');
     if (!grid) return;
     grid.innerHTML = '';
+
     const year = calCurrentDate.getFullYear();
     const month = calCurrentDate.getMonth();
+
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    
     document.getElementById('cal-month-title').textContent = `${monthNames[month]} ${year}`;
-    
-    const firstDay = new Date(year, month, 1).getDay();
-    const lastDay = new Date(year, month + 1, 0).getDate();
-    
-    // Calendar implementation logic...
-    for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
-    for(let i=1; i<=lastDay; i++) {
-       const cell = document.createElement('div');
-       cell.style.border = '1px solid #eee'; cell.style.padding = '8px';
-       cell.innerHTML = `<strong>${i}</strong>`;
-       grid.appendChild(cell);
+
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const dayCounts = {};
+
+    const globalParseSheetDate = (dateStr) => {
+      if (!dateStr || String(dateStr).trim() === '-' || String(dateStr).trim() === '') return null;
+      const parts = String(dateStr).trim().split(' ');
+      const datePart = parts[0];
+      const timePart = parts[1] || '00:00:00';
+      if (datePart.includes('/')) {
+        const pts = datePart.split('/');
+        if (pts.length === 3) {
+          const yr = pts[2].length === 2 ? '20' + pts[2] : pts[2];
+          const d = new Date(`${yr}-${pts[1]}-${pts[0]}T${timePart}`);
+          if (!isNaN(d)) return d;
+        }
+      }
+      const fallback = new Date(dateStr);
+      return isNaN(fallback) ? null : fallback;
+    };
+
+    const getCalendarDateStr = (row) => row.Cads_Uploaded_Date || row.cads_uploaded_date;
+
+    const calendarRows = allRequests.filter((r) => isCadsCompletedStatus(r.status));
+
+    calendarRows.forEach((row) => {
+      const d = globalParseSheetDate(getCalendarDateStr(row));
+      if (d && !isNaN(d) && d.getFullYear() === year && d.getMonth() === month) {
+        const day = d.getDate();
+        dayCounts[day] = (dayCounts[day] || 0) + 1;
+      }
+    });
+
+    for (let x = 0; x < firstDayIndex; x++) {
+      const emptyCell = document.createElement('div');
+      emptyCell.style.background = '#f9fafb';
+      emptyCell.style.borderRadius = '6px';
+      grid.appendChild(emptyCell);
     }
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dayCell = document.createElement('div');
+      dayCell.style.border = '1px solid #e5e7eb';
+      dayCell.style.borderRadius = '6px';
+      dayCell.style.padding = '8px';
+      dayCell.style.display = 'flex';
+      dayCell.style.flexDirection = 'column';
+      dayCell.style.backgroundColor = '#ffffff';
+
+      const dateNumber = document.createElement('strong');
+      dateNumber.style.color = '#374151';
+      dateNumber.textContent = String(i);
+      dayCell.appendChild(dateNumber);
+
+      if (dayCounts[i]) {
+        const countBadge = document.createElement('div');
+        countBadge.style.marginTop = 'auto';
+        countBadge.style.backgroundColor = 'var(--primary-color)';
+        countBadge.style.color = '#fff';
+        countBadge.style.padding = '4px 8px';
+        countBadge.style.borderRadius = '4px';
+        countBadge.style.fontSize = '12px';
+        countBadge.style.fontWeight = 'bold';
+        countBadge.style.textAlign = 'center';
+        countBadge.style.cursor = 'pointer';
+        countBadge.textContent = `${dayCounts[i]} completion${dayCounts[i] > 1 ? 's' : ''}`;
+
+        countBadge.addEventListener('mouseenter', () => { countBadge.style.opacity = '0.8'; });
+        countBadge.addEventListener('mouseleave', () => { countBadge.style.opacity = '1'; });
+
+        countBadge.addEventListener('click', () => {
+          const dailyReqs = calendarRows.filter((r) => {
+            const rd = globalParseSheetDate(getCalendarDateStr(r));
+            return rd && !isNaN(rd) && rd.getFullYear() === year && rd.getMonth() === month && rd.getDate() === i;
+          });
+
+          const modal = document.getElementById('calendar-day-modal');
+          const title = document.getElementById('calendar-day-title');
+          const content = document.getElementById('calendar-day-content');
+
+          if (modal && title && content) {
+            title.textContent = `Completed CADS on ${monthNames[month]} ${i}, ${year}`;
+            content.innerHTML = dailyReqs.map((r) => `
+              <div style="padding: 10px 8px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                <div style="display:flex; flex-direction: column;">
+                  <span style="font-weight: 500; color: var(--text-main);">${r.id || 'Unknown ID'}</span>
+                  <span style="font-size: 12px; color: var(--text-muted);">${r.customer || r.Customer || 'No Customer'}</span>
+                </div>
+                <button class="btn-outline calendar-details-btn" data-id="${r.id || ''}" style="padding: 6px 10px; font-size: 12px; display: inline-flex;">Details</button>
+              </div>
+            `).join('');
+
+            content.querySelectorAll('.calendar-details-btn').forEach((btn) => {
+              btn.addEventListener('click', (ev) => {
+                const rid = ev.currentTarget.getAttribute('data-id');
+                showDetails(rid);
+              });
+            });
+            modal.style.display = 'flex';
+          }
+        });
+
+        dayCell.appendChild(countBadge);
+      }
+      grid.appendChild(dayCell);
+    }
+  }
+
+  const closeCalDayBtn = document.getElementById('close-calendar-day-btn');
+  if (closeCalDayBtn) {
+    closeCalDayBtn.addEventListener('click', () => {
+      const m = document.getElementById('calendar-day-modal');
+      if (m) m.style.display = 'none';
+    });
+  }
+
+  const calPrevBtn = document.getElementById('cal-prev-btn');
+  if (calPrevBtn) {
+    calPrevBtn.addEventListener('click', () => {
+      calCurrentDate.setMonth(calCurrentDate.getMonth() - 1);
+      renderCalendar();
+    });
+  }
+
+  const calNextBtn = document.getElementById('cal-next-btn');
+  if (calNextBtn) {
+    calNextBtn.addEventListener('click', () => {
+      calCurrentDate.setMonth(calCurrentDate.getMonth() + 1);
+      renderCalendar();
+    });
   }
 
   // --- Modals ---
