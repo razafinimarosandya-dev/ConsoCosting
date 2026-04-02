@@ -1108,7 +1108,7 @@ tbody tr:hover {
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" placeholder="Search Style or Customer..." />
+          <input type="text" id="global-search-conso" placeholder="Search Style or Customer..." />
         </div>
         <div class="nav-links">
           <a href="https://costing-home.vercel.app/">Home</a>
@@ -1389,9 +1389,18 @@ tbody tr:hover {
   let allRequests = [];
   let currentTab = 'AWAITING CONSO';
   let advFilter = { id: '', style: '', customer: '', pl: '' };
+  let globalSearchTextConso = '';
   let calCurrentDate = new Date();
 
   const normalizeStatus = (s) => String(s || '').toUpperCase().replace(/\s+/g, ' ').trim();
+
+  const searchInput = document.getElementById('global-search-conso');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      globalSearchTextConso = e.target.value.trim().toLowerCase();
+      renderAll();
+    });
+  }
 
   function isCadsCompletedStatus(statusRaw) {
     const n = normalizeStatus(statusRaw);
@@ -1453,6 +1462,13 @@ tbody tr:hover {
 
     const filtered = allRequests.filter(row => {
       if (normalizeStatus(row.status) !== 'AWAITING CONSO') return false;
+
+      if (globalSearchTextConso) {
+        const match = String(row.style || row.Style || '').toLowerCase().includes(globalSearchTextConso) ||
+                      String(row.customer || row.Customer || '').toLowerCase().includes(globalSearchTextConso) ||
+                      String(row.id || '').toLowerCase().includes(globalSearchTextConso);
+        if (!match) return false;
+      }
 
       if (advFilter.id && !(row.id || '').toLowerCase().includes(advFilter.id.toLowerCase())) return false;
       if (advFilter.style && !(row.style || row.Style || '').toLowerCase().includes(advFilter.style.toLowerCase())) return false;
@@ -1761,7 +1777,18 @@ tbody tr:hover {
     gallery.style.gap = '';
     gallery.style.display = 'flex'; // it is flex-direction: column in CSS
 
-    const filtered = allRequests.filter(row => isCadsCompletedStatus(row.status));
+    const filtered = allRequests.filter(row => {
+      if (!isCadsCompletedStatus(row.status)) return false;
+
+      if (globalSearchTextConso) {
+        const match = String(row.style || row.Style || '').toLowerCase().includes(globalSearchTextConso) ||
+                      String(row.customer || row.Customer || '').toLowerCase().includes(globalSearchTextConso) ||
+                      String(row.id || '').toLowerCase().includes(globalSearchTextConso);
+        if (!match) return false;
+      }
+      
+      return true;
+    });
     
     const footerLabel = document.querySelector('.pattern-footer-text');
     if (footerLabel) footerLabel.textContent = `Showing ${filtered.length} tasks`;
