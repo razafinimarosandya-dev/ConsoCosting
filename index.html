@@ -1570,12 +1570,6 @@ tbody tr:hover {
         <td style="padding: 16px 0;"><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">Completed</span></td>
         <td style="padding: 16px 0; text-align: center;">
           <div style="display: flex; justify-content: center; gap: 6px;">
-            <button class="folder-btn" data-id="${safeId}" title="Folder" style="padding: 6px; border-radius: 6px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; cursor: pointer;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            </button>
-            <button class="remarks-btn" data-id="${safeId}" title="Revert Status" style="padding: 6px; border-radius: 6px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; cursor: pointer;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </button>
             <button class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Details</button>
           </div>
         </td>
@@ -1583,8 +1577,6 @@ tbody tr:hover {
       completeBody.appendChild(tr);
     });
 
-    completeBody.querySelectorAll('.folder-btn').forEach(btn => btn.addEventListener('click', () => openFolder(btn.dataset.id)));
-    completeBody.querySelectorAll('.remarks-btn').forEach(btn => btn.addEventListener('click', () => openRemarks(btn.dataset.id)));
     completeBody.querySelectorAll('.details-btn').forEach(btn => btn.addEventListener('click', () => showDetails(btn.dataset.id)));
   }
 
@@ -1872,12 +1864,6 @@ tbody tr:hover {
         <span class="pattern-gallery-cell"><span class="status-badge success-badge">Completed</span></span>
         <span class="pattern-gallery-row__actions">
           <div style="display: flex; justify-content: center; gap: 6px;">
-            <button type="button" class="folder-btn" data-id="${safeId}" style="padding: 6px; border-radius: 6px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; cursor: pointer;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            </button>
-            <button type="button" class="remarks-btn" data-id="${safeId}" style="padding: 6px; border-radius: 6px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; cursor: pointer;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </button>
             <button type="button" class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Details</button>
           </div>
         </span>
@@ -1886,9 +1872,7 @@ tbody tr:hover {
       gallery.appendChild(line);
     });
 
-    // Reattach event listeners using the same ones previously attached
-    gallery.querySelectorAll('.folder-btn').forEach(btn => btn.addEventListener('click', (e) => openFolder(e.currentTarget.dataset.id)));
-    gallery.querySelectorAll('.remarks-btn').forEach(btn => btn.addEventListener('click', (e) => openRemarks(e.currentTarget.dataset.id)));
+    // Reattach event listeners for details only
     gallery.querySelectorAll('.details-btn').forEach(btn => btn.addEventListener('click', (e) => showDetails(e.currentTarget.dataset.id)));
   }
 
