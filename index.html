@@ -1410,6 +1410,20 @@ tbody tr:hover {
     return n === 'COMPLETED';
   }
 
+  function formatToDDMMYYYY(dateStr) {
+    if (!dateStr || dateStr === '-') return '-';
+    // If it's already DD/MM/YYYY or DD/MM/YYYY HH:mm:ss, clean it
+    if (typeof dateStr === 'string' && dateStr.includes('/')) {
+      return dateStr.split(' ')[0]; // Take only the date part
+    }
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
   async function loadConsoTasks() {
     try {
       const response = await fetch(`${GOOGLE_SCRIPT_URL}?t=${new Date().getTime()}`);
@@ -1502,7 +1516,7 @@ tbody tr:hover {
             ${row.assignee || row.PL_Name || 'Unassigned'}
           </div>
         </td>
-        <td>${row.createdDate || row.Costing_Ready_Date || '-'}</td>
+        <td>${formatToDDMMYYYY(row.createdDate || row.Costing_Ready_Date)}</td>
         <td><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">AWAITING CONSO</span></td>
         <td style="text-align: center;">
           <div style="display: flex; justify-content: center; gap: 8px; align-items: center;">
@@ -1628,7 +1642,7 @@ tbody tr:hover {
       { label: 'Style', value: row.style || row.Style },
       { label: 'Customer', value: row.customer || row.Customer },
       { label: 'Status', value: row.status || row.Status },
-      { label: 'CADS uploaded', value: row.Cads_Uploaded_Date },
+      { label: 'CADS uploaded', value: formatToDDMMYYYY(row.Cads_Uploaded_Date) },
       { label: 'Remarks', value: row.Remarks || row.remarks },
       { label: 'Folder Path', value: row.folderLink || row.folder_link, isLink: true }
     ];
