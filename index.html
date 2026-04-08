@@ -1337,6 +1337,22 @@ tbody tr:hover {
       </div>
     </div>
 
+    <!-- Conso Upload Confirmation Modal -->
+    <div class="modal" id="conso-upload-modal"
+      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+      <div class="card"
+        style="width: 500px; padding: 24px; background: white; border-radius: 8px; max-height: 80vh; overflow-y: auto;">
+        <h3 style="margin-bottom: 16px; border-bottom: 1px solid #ddd; padding-bottom: 8px;">Upload Action Confirmation</h3>
+        <div id="conso-upload-content" style="line-height: 1.6; font-size: 14px; margin-bottom: 24px;">
+          <!-- Populated via JS -->
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <button class="btn-secondary" id="close-upload-modal-btn" style="padding: 8px 16px;">Close</button>
+          <button class="btn-primary" id="process-upload-btn" style="padding: 8px 16px;">Process</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Details Modal -->
     <div class="modal" id="details-modal"
       style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
@@ -1528,7 +1544,7 @@ tbody tr:hover {
       tableBody.appendChild(tr);
     });
 
-    tableBody.querySelectorAll('.upload-btn').forEach(btn => btn.addEventListener('click', () => handleUpload(btn.dataset.id)));
+    tableBody.querySelectorAll('.upload-btn').forEach(btn => btn.addEventListener('click', () => showUploadModal(btn.dataset.id)));
     tableBody.querySelectorAll('.remarks-btn').forEach(btn => btn.addEventListener('click', () => openRemarks(btn.dataset.id)));
   }
 
@@ -1628,6 +1644,82 @@ tbody tr:hover {
       console.error(err); 
       alert('Update failed'); 
     }
+  }
+
+  let currentUploadId = null;
+
+  function showUploadModal(id) {
+    currentUploadId = id;
+    const rowData = allRequests.find(r => r.id === id);
+    if (!rowData) return;
+    const content = document.getElementById('conso-upload-content');
+    
+    const displayFields = [
+      { label: 'Request ID', value: rowData.id || rowData.C_Number },
+      { label: 'Title', value: rowData.Title || rowData.Style || rowData.style },
+      { label: 'Customer', value: rowData.Customer || rowData.customer },
+      { label: 'Cus Dept', value: rowData.Cus_Dept || rowData.cusDept || rowData['Customer Department'] },
+      { label: 'TKL Season', value: rowData.TKL_Season || rowData.tklSeason },
+      { label: 'Main Fabric', value: rowData.Main_Fabric || rowData.mainFabric },
+      { label: 'Fabric Header', value: rowData.Fabric_Header || rowData.fabricHeader },
+      { label: 'PL Name', value: rowData.PL_Name || rowData.assignee || rowData.PM_Name || rowData.Pattern_Maker },
+      { label: 'Status', value: rowData.Status || rowData.status },
+      { label: 'Created', value: rowData.Created || rowData.createdDate || rowData.Requested_Date || rowData.Cads_Uploaded_Date || rowData.Uploaded_Date },
+      { label: 'Created By', value: rowData['Created By'] || rowData.createdBy },
+      { label: 'Remarks', value: rowData.remarks || rowData.Remarks || '-' },
+      { label: 'Folder Path', value: rowData.Folder_Path || rowData.folderLink || rowData.folder_link || '-' }
+    ];
+
+    content.innerHTML = displayFields.map(field => {
+      let displayValue = field.value || '-';
+      if (field.label === 'Created' && displayValue !== '-') {
+        displayValue = formatToDDMMYYYY(displayValue);
+      } else if (field.label === 'Status') {
+        displayValue = `<span class="badge" style="background-color: #d1fae5; color: #059669; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 11px;">${displayValue}</span>`;
+      } else if (field.label === 'Folder Path' && displayValue !== '-') {
+        if (String(displayValue).startsWith('http')) {
+          displayValue = `<a href="${displayValue}" target="_blank" style="color: var(--primary-color); text-decoration: underline; word-break: break-all;">Open Folder</a>`;
+        } else {
+          displayValue = `<span style="word-break: break-all; font-family: monospace; font-size: 11px; background: #f3f4f6; padding: 4px 6px; border-radius: 4px;">${displayValue}</span>`;
+        }
+      }
+
+      return `
+        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #f3f4f6; padding: 10px 4px; align-items: flex-start; gap: 16px;">
+          <strong style="color: var(--text-muted); font-weight: 500; min-width: 120px;">${field.label}</strong>
+          <span style="color: var(--text-main); font-weight: 500; text-align: right; word-break: break-word;">${displayValue}</span>
+        </div>
+      `;
+    }).join('');
+    
+    document.getElementById('conso-upload-modal').style.display = 'flex';
+  }
+
+  // Bind the New Conso Upload Modal Buttons
+  const closeUploadBtn = document.getElementById('close-upload-modal-btn');
+  if (closeUploadBtn) {
+    closeUploadBtn.addEventListener('click', () => {
+      document.getElementById('conso-upload-modal').style.display = 'none';
+    });
+  }
+
+  const processUploadBtn = document.getElementById('process-upload-btn');
+  if (processUploadBtn) {
+    processUploadBtn.addEventListener('click', async () => {
+      if (currentUploadId) {
+        const originalText = processUploadBtn.textContent;
+        processUploadBtn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:currentColor;animation:spin 0.8s ease-in-out infinite;vertical-align:sub;margin-right:6px;"></span>Processing...';
+        processUploadBtn.disabled = true;
+        processUploadBtn.style.opacity = '0.7';
+
+        await handleUpload(currentUploadId);
+          
+        processUploadBtn.textContent = originalText;
+        processUploadBtn.disabled = false;
+        processUploadBtn.style.opacity = '1';
+        document.getElementById('conso-upload-modal').style.display = 'none';
+      }
+    });
   }
 
   function showDetails(id) {
