@@ -1646,15 +1646,15 @@ tbody tr:hover {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td class="req-id" style="color: var(--primary-color); font-weight: 600;">${safeId}</td>
-        <td style="font-weight: 500;">${row.style || row.Style || '-'}</td>
-        <td style="color: var(--text-muted);">${row.customer || row.Customer || '-'}</td>
+        <td style="font-weight: 500;">${row.Customer_Ref || row.style || row.Style || '-'}</td>
+        <td style="color: var(--text-muted);">${row.Customer || row.customer || '-'}</td>
         <td>
           <div style="display: flex; align-items: center; gap: 8px;">
             <img src="https://i.pravatar.cc/150?u=${encodeURIComponent(safeId)}" style="width: 24px; height: 24px; border-radius: 50%;" />
-            ${row.assignee || row.PL_Name || 'Unassigned'}
+            ${row.PL_Name || row.assignee || 'Unassigned'}
           </div>
         </td>
-        <td>${formatToDDMMYYYY(row.createdDate || row.Costing_Ready_Date)}</td>
+        <td>${formatToDDMMYYYY(row.Costing_Expected_Date || row.costing_expected_date || row.createdDate)}</td>
         <td><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">AWAITING CONSO</span></td>
         <td style="text-align: center;">
           <div style="display: flex; justify-content: center; gap: 8px; align-items: center;">
@@ -1697,16 +1697,16 @@ tbody tr:hover {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="padding: 16px 0; color: var(--primary-color); font-weight: 600;">${safeId}</td>
-        <td style="padding: 16px 0; font-weight: 500;">${row.style || row.Style || '-'}</td>
-        <td style="padding: 16px 0; color: var(--text-muted);">${row.customer || row.Customer || '-'}</td>
+        <td style="padding: 16px 0; font-weight: 500;">${row.Customer_Ref || row.style || row.Style || '-'}</td>
+        <td style="padding: 16px 0; color: var(--text-muted);">${row.Customer || row.customer || '-'}</td>
         <td style="padding: 16px 0;">
            <div style="display: flex; align-items: center; gap: 8px;">
              <img src="https://i.pravatar.cc/150?u=${encodeURIComponent(safeId)}" style="width: 24px; height: 24px; border-radius: 50%;" />
-             ${row.assignee || row.PL_Name || 'Unassigned'}
+             ${row.PL_Name || row.assignee || 'Unassigned'}
            </div>
         </td>
-        <td style="padding: 16px 0;">${row.Cads_Uploaded_Date || row.createdDate || row.Costing_Ready_Date || '-'}</td>
-        <td style="padding: 16px 0;"><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">Completed</span></td>
+        <td style="padding: 16px 0;">${formatToDDMMYYYY(row.Cads_Uploaded_Date || row.Costing_Expected_Date || row.createdDate)}</td>
+        <td style="padding: 16px 0;"><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">COMPLETED</span></td>
         <td style="padding: 16px 0; text-align: center;">
           <div style="display: flex; justify-content: center; gap: 6px;">
             <button class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Details</button>
@@ -1786,20 +1786,19 @@ tbody tr:hover {
     
     const displayFields = [
       { label: 'C Number', value: rowData.id || rowData.C_Number },
-      { label: 'Customer Reference', value: rowData.Title || rowData.Style || rowData.style },
+      { label: 'Customer Reference', value: rowData.Customer_Ref || rowData.style || rowData.Title },
       { label: 'Customer', value: rowData.Customer || rowData.customer },
-      { label: 'Cus Dept', value: rowData.Cus_Dept || rowData.cusDept || rowData['Customer Department'] },
-      { label: 'TKL Season', value: rowData.TKL_Season || rowData.tklSeason },
-      { label: 'Main Fabric', value: rowData.Main_Fabric || rowData.mainFabric },
-      { label: 'Fabric Header', value: rowData.Fabric_Header || rowData.fabricHeader },
-      { label: 'PL Name', value: rowData.PL_Name || rowData.assignee || rowData.PM_Name || rowData.Pattern_Maker },
-      { label: 'CADs Name', value: rowData.CADS_Name || rowData['CADS Name'] || rowData.Cads_Name || rowData.cadsName || rowData.ACC_Name || rowData.Accessory_Name },
+      { label: 'Customer Dept', value: rowData.Customer_Department || rowData.customer_department || rowData.Cus_Dept },
+      { label: 'Season', value: rowData.Season || rowData.season || rowData.TKL_Season },
+      { label: 'Sample Type', value: rowData.Sample_Type || rowData.sample_type },
+      { label: 'PL Name', value: rowData.PL_Name || rowData.pl_name || rowData.assignee },
+      { label: 'Expected Date', value: rowData.Costing_Expected_Date || rowData.costing_expected_date },
       { label: 'Status', value: rowData.Status || rowData.status },
-      { label: 'Created', value: rowData.Created || rowData.createdDate || rowData.Requested_Date || rowData.Cads_Uploaded_Date || rowData.Uploaded_Date },
-      { label: 'Created By', value: rowData['Created By'] || rowData.createdBy },
-      { label: 'Remarks', value: rowData.remarks || rowData.Remarks || '-' },
-      { label: 'Remark Conso', value: rowData.Conso_Remarks || '-' },
-      { label: 'Folder Path', value: rowData.Folder_Path || rowData.folderLink || rowData.folder_link || '-' }
+      { label: 'Folder Path', value: rowData.folder_path || rowData.folderLink || rowData.Folder_Path || '-' },
+      { label: 'Created', value: rowData.Created || rowData.created || rowData.createdDate },
+      { label: 'Created By', value: rowData['Created By'] || rowData.created_by || rowData.createdBy },
+      { label: 'Remarks', value: rowData.Remarks || rowData.remarks || '-' },
+      { label: 'Remark Conso', value: rowData.Conso_Remarks || rowData.conso_remarks || '-' }
     ];
 
     content.innerHTML = displayFields.map(field => {
@@ -1878,19 +1877,19 @@ tbody tr:hover {
     const content = document.getElementById('details-content');
     const displayFields = [
       { label: 'C Number', value: rowData.id || rowData.C_Number },
-      { label: 'Customer Reference', value: rowData.Title || rowData.Style || rowData.style },
+      { label: 'Customer Reference', value: rowData.Customer_Ref || rowData.style || rowData.Title },
       { label: 'Customer', value: rowData.Customer || rowData.customer },
-      { label: 'Cus Dept', value: rowData.Cus_Dept || rowData.cusDept || rowData['Customer Department'] },
-      { label: 'TKL Season', value: rowData.TKL_Season || rowData.tklSeason },
-      { label: 'Main Fabric', value: rowData.Main_Fabric || rowData.mainFabric },
-      { label: 'Fabric Header', value: rowData.Fabric_Header || rowData.fabricHeader },
-      { label: 'PL Name', value: rowData.PL_Name || rowData.assignee || rowData.PM_Name || rowData.Pattern_Maker },
+      { label: 'Customer Dept', value: rowData.Customer_Department || rowData.customer_department || rowData.Cus_Dept },
+      { label: 'Season', value: rowData.Season || rowData.season || rowData.TKL_Season },
+      { label: 'Sample Type', value: rowData.Sample_Type || rowData.sample_type },
+      { label: 'PL Name', value: rowData.PL_Name || rowData.pl_name || rowData.assignee },
+      { label: 'Expected Date', value: rowData.Costing_Expected_Date || rowData.costing_expected_date },
       { label: 'Status', value: rowData.Status || rowData.status },
-      { label: 'Created', value: rowData.Created || rowData.createdDate || rowData.Requested_Date || rowData.Cads_Uploaded_Date || rowData.Uploaded_Date },
-      { label: 'Created By', value: rowData['Created By'] || rowData.createdBy },
-      { label: 'Remarks', value: rowData.remarks || rowData.Remarks || '-' },
-      { label: 'Remark Conso', value: rowData.Conso_Remarks || '-' },
-      { label: 'Folder Path', value: rowData.Folder_Path || rowData.folderLink || rowData.folder_link || '-' }
+      { label: 'Folder Path', value: rowData.folder_path || rowData.folderLink || rowData.Folder_Path || '-' },
+      { label: 'Created', value: rowData.Created || rowData.created || rowData.createdDate },
+      { label: 'Created By', value: rowData['Created By'] || rowData.created_by || rowData.createdBy },
+      { label: 'Remarks', value: rowData.Remarks || rowData.remarks || '-' },
+      { label: 'Remark Conso', value: rowData.Conso_Remarks || rowData.conso_remarks || '-' }
     ];
 
     content.innerHTML = displayFields.map(field => {
