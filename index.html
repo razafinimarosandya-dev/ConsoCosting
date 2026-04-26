@@ -1659,6 +1659,7 @@ tbody tr:hover {
         <td style="text-align: center;">
           <div style="display: flex; justify-content: center; gap: 8px; align-items: center;">
             <button class="btn-outline upload-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Upload</button>
+            <button class="btn-outline revert-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border-color: #f59e0b; color: #d97706;">Revert</button>
           </div>
         </td>
       `;
@@ -1666,6 +1667,7 @@ tbody tr:hover {
     });
 
     tableBody.querySelectorAll('.upload-btn').forEach(btn => btn.addEventListener('click', () => showUploadModal(btn.dataset.id)));
+    tableBody.querySelectorAll('.revert-btn').forEach(btn => btn.addEventListener('click', () => openRemarks(btn.dataset.id)));
   }
 
   function renderCompleteConsoTable() {
@@ -1710,6 +1712,7 @@ tbody tr:hover {
         <td style="padding: 16px 0; text-align: center;">
           <div style="display: flex; justify-content: center; gap: 6px;">
             <button class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Details</button>
+            <button class="btn-outline revert-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border-color: #f59e0b; color: #d97706;">Revert</button>
           </div>
         </td>
       `;
@@ -1717,6 +1720,7 @@ tbody tr:hover {
     });
 
     completeBody.querySelectorAll('.details-btn').forEach(btn => btn.addEventListener('click', () => showDetails(btn.dataset.id)));
+    completeBody.querySelectorAll('.revert-btn').forEach(btn => btn.addEventListener('click', () => openRemarks(btn.dataset.id)));
   }
 
   function openFolder(id) {
@@ -2146,6 +2150,7 @@ tbody tr:hover {
         <span class="pattern-gallery-row__actions">
           <div style="display: flex; justify-content: center; gap: 6px;">
             <button type="button" class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Details</button>
+            <button type="button" class="btn-outline gallery-revert-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border-color: #f59e0b; color: #d97706;">Revert</button>
           </div>
         </span>
       `;
@@ -2153,8 +2158,9 @@ tbody tr:hover {
       gallery.appendChild(line);
     });
 
-    // Reattach event listeners for details only
+    // Reattach event listeners
     gallery.querySelectorAll('.details-btn').forEach(btn => btn.addEventListener('click', (e) => showDetails(e.currentTarget.dataset.id)));
+    gallery.querySelectorAll('.gallery-revert-btn').forEach(btn => btn.addEventListener('click', (e) => openRemarks(e.currentTarget.dataset.id)));
   }
 
   function setActiveTab(id) {
