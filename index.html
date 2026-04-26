@@ -1203,7 +1203,7 @@ tbody tr:hover {
             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
           </svg>
         </button>
-        <div class="profile-container" id="profile-container">
+        <div class="profile-container" id="profile-trigger">
           <img class="avatar" id="user-avatar" src="https://i.pravatar.cc/150?img=52" alt="User Profile" />
           <div class="user-dropdown" id="user-dropdown">
             <div class="dropdown-header">
@@ -2342,23 +2342,29 @@ tbody tr:hover {
   document.getElementById('close-remarks-btn').addEventListener('click', () => document.getElementById('remarks-modal').style.display = 'none');
 
   // --- Session Management ---
+  const REMEMBERED_USER_KEY = 'ACC_REMEMBERED_USER';
+
   function consumeUrlSession() {
     const params = new URLSearchParams(window.location.search);
-    const sessionEmail = params.get('session_email');
-    const sessionName = params.get('session_name');
-    if (sessionEmail && sessionName) {
-      const userData = { email: sessionEmail, name: sessionName };
-      localStorage.setItem('ACC_REMEMBERED_USER', JSON.stringify(userData));
-      // Clean URL
-      const newUrl = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, newUrl);
+    const sessionData = params.get('session');
+    if (sessionData) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(sessionData))));
+        if (decoded && (decoded.loginId || decoded.email)) {
+          localStorage.setItem(REMEMBERED_USER_KEY, JSON.stringify(decoded));
+          const newUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
+        }
+      } catch (e) {
+        console.error('Session decode error:', e);
+      }
     }
   }
 
   function setupUserSession() {
     consumeUrlSession();
-    const storedUser = localStorage.getItem('ACC_REMEMBERED_USER');
-    const profileContainer = document.getElementById('profile-container');
+    const storedUser = localStorage.getItem(REMEMBERED_USER_KEY);
+    const profileTrigger = document.getElementById('profile-trigger');
     const dropdown = document.getElementById('user-dropdown');
     const nameEl = document.getElementById('user-display-name');
     const emailEl = document.getElementById('user-display-email');
@@ -2366,14 +2372,21 @@ tbody tr:hover {
     const signOutBtn = document.getElementById('sign-out-btn');
 
     if (storedUser) {
-      const user = JSON.parse(storedUser);
-      if (nameEl) nameEl.textContent = user.name || user.email.split('@')[0];
-      if (emailEl) emailEl.textContent = user.email;
-      if (avatarEl) avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.email)}&background=2563eb&color=fff`;
+      try {
+        const user = JSON.parse(storedUser);
+        const name = user.username || user.name || user.loginId || 'User';
+        const email = user.email || user.loginId || '';
+        
+        if (nameEl) nameEl.textContent = name;
+        if (emailEl) emailEl.textContent = email;
+        if (avatarEl) avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2563eb&color=fff&bold=true`;
+      } catch (e) {
+        console.error('Session parse error:', e);
+      }
     }
 
-    if (profileContainer && dropdown) {
-      profileContainer.addEventListener('click', (e) => {
+    if (profileTrigger && dropdown) {
+      profileTrigger.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdown.classList.toggle('active');
       });
@@ -2383,7 +2396,7 @@ tbody tr:hover {
     if (signOutBtn) {
       signOutBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        localStorage.removeItem('ACC_REMEMBERED_USER');
+        localStorage.removeItem(REMEMBERED_USER_KEY);
         window.location.href = 'login.html';
       });
     }
