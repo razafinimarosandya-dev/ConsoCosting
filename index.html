@@ -1721,15 +1721,15 @@ tbody tr:hover {
 
   function openFolder(id) {
     const row = allRequests.find(r => r.id === id);
-    const link = row ? (row.folderLink || row.folder_link || '') : '';
-    if (link.startsWith('http')) window.open(link, '_blank');
+    const link = row ? (row.folderLink || row.folder_link || row.folder_path || row.Folder_Path || '') : '';
+    if (link && String(link).startsWith('http')) window.open(link, '_blank');
     else alert('No folder link available.');
   }
 
   async function handleUpload(id, userRemarks, latenessRemarks) {
     const row = allRequests.find(r => r.id === id);
-    const link = row ? (row.folderLink || row.folder_link || '') : '';
-    if (link.startsWith('http')) {
+    const link = row ? (row.folderLink || row.folder_link || row.folder_path || row.Folder_Path || '') : '';
+    if (link && String(link).startsWith('http')) {
       window.open(link, '_blank');
     } else {
       alert('No folder link available. Please ensure a folder path is assigned before uploading.');
