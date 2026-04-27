@@ -1773,56 +1773,56 @@ tbody tr:hover {
 
   async function handleUpload(id, userRemarks, latenessRemarks) {
     const row = allRequests.find(r => r.id === id);
-    const link = row ? (row.folderLink || row.folder_link || row.folder_path || row.Folder_Path || '') : '';
-    if (link && String(link).startsWith('http')) {
-      window.open(link, '_blank');
-    } else {
-      alert('No folder link available. Please ensure a folder path is assigned before uploading.');
+    if (!row) {
+      alert("Error: Request data not found.");
       return;
     }
 
     try {
       const nowIso = new Date().toISOString();
-      // Get connected user email
       const storedUser = localStorage.getItem('ACC_REMEMBERED_USER');
       const currentUserEmail = storedUser ? JSON.parse(storedUser).email : '';
 
+      const payload = {
+        requestId: id,
+        status: 'Completed',
+        Status: 'Completed',
+        Cads_Uploaded_Date: nowIso,
+        remarks: userRemarks || '',
+        Remarks: userRemarks || '',
+        Conso_Remarks: userRemarks || '',
+        Lateness_Remarks: latenessRemarks || '',
+        latenessRemarks: latenessRemarks || '',
+        connectedUserEmail: currentUserEmail,
+        action: 'update',
+        timestamp: nowIso
+      };
+
       await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          requestId: id,
-          status: 'Completed',
-          Status: 'Completed',
-          Cads_Uploaded_Date: nowIso,
-          remarks: userRemarks || '',
-          Remarks: userRemarks || '',
-          Conso_Remarks: userRemarks || '',
-          Lateness_Remarks: latenessRemarks || '',
-          latenessRemarks: latenessRemarks || '',
-          connectedUserEmail: currentUserEmail,
-          action: 'update',
-          timestamp: nowIso
-        })
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
       });
-      if (row) {
-        row.status = 'Completed';
-        row.Status = 'Completed';
-        row.Cads_Uploaded_Date = nowIso;
-        if (userRemarks) {
-           row.Remarks = userRemarks;
-           row.Conso_Remarks = userRemarks;
-        }
-        if (latenessRemarks) {
-          row.Lateness_Remarks = latenessRemarks;
-        }
+      
+      // Update local data optimistically
+      row.status = 'Completed';
+      row.Status = 'Completed';
+      row.Cads_Uploaded_Date = nowIso;
+      if (userRemarks) {
+        row.Remarks = userRemarks;
+        row.Conso_Remarks = userRemarks;
       }
-      // Refresh from backend so counts/tables match the sheet state.
+      if (latenessRemarks) {
+        row.Lateness_Remarks = latenessRemarks;
+      }
+
+      // Refresh from backend and switch tab
       await loadConsoTasks();
-      document.getElementById('nav-complete-conso').click();
+      const navComplete = document.getElementById('nav-complete-conso');
+      if (navComplete) navComplete.click();
     } catch (err) { 
       console.error(err); 
-      alert('Update failed'); 
+      alert('Update failed: ' + err.message); 
     }
   }
 
@@ -1892,6 +1892,13 @@ tbody tr:hover {
   const processUploadBtn = document.getElementById('process-upload-btn');
   if (processUploadBtn) {
     processUploadBtn.addEventListener('click', () => {
+      // Open folder link if available before showing remarks modal
+      const rowData = allRequests.find(r => r.id === currentUploadId);
+      const link = rowData ? (rowData.folder_path || rowData.Folder_Path || rowData.folderLink || '') : '';
+      if (link && String(link).startsWith('http')) {
+        window.open(link, '_blank');
+      }
+
       document.getElementById('conso-upload-modal').style.display = 'none';
       document.getElementById('conso-remarks-textarea').value = '';
       const latenessRemarksTextarea = document.getElementById('conso-lateness-remarks-textarea');
