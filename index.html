@@ -1845,9 +1845,9 @@ tbody tr:hover {
       { label: 'Expected Date', value: formatToDDMMYYYY(rowData.costing_expected_date || rowData.Costing_Expected_Date) },
       { label: 'Status', value: rowData.status || rowData.Status || '-' },
       { label: 'Created At', value: formatToDDMMYYYY(rowData.created || rowData.Created || rowData.createdDate) },
-      { label: 'Created By', value: rowData.created_by || rowData['Created By'] || rowData.createdBy || '-' },
-      { label: 'Request Remarks', value: rowData.remarks || rowData.Remarks || '-' },
-      { label: 'Conso Remarks', value: rowData.conso_remarks || rowData.Conso_Remarks || '-' }
+      { label: 'Request Remarks', value: rowData.remarks || rowData.Remarks || rowData.Req_Remarks || '-' },
+      { label: 'Techpack Remarks', value: rowData.Techpack_Remarks || rowData.techpack_remarks || '-' },
+      { label: 'Pattern Remarks', value: rowData.Pattern_Remarks || rowData.pattern_remarks || '-' }
     ];
 
     let html = `<div class="form-grid">`;
@@ -1943,9 +1943,9 @@ tbody tr:hover {
       { label: 'Status', value: rowData.status || rowData.Status || '-' },
       { label: 'Created At', value: formatToDDMMYYYY(rowData.created || rowData.Created || rowData.createdDate) },
       { label: 'Created By', value: rowData.created_by || rowData['Created By'] || '-' },
-      { label: 'Request Remarks', value: rowData.remarks || rowData.Remarks || '-' },
+      { label: 'Request Remarks', value: rowData.remarks || rowData.Remarks || rowData.Req_Remarks || '-' },
       { label: 'Techpack Remarks', value: rowData.Techpack_Remarks || rowData.techpack_remarks || '-' },
-      { label: 'Conso Remarks', value: rowData.conso_remarks || rowData.Conso_Remarks || '-' },
+      { label: 'Pattern Remarks', value: rowData.Pattern_Remarks || rowData.pattern_remarks || '-' },
       { label: 'Lateness Remarks', value: rowData.lateness_remarks || rowData.Lateness_Remarks || '-' }
     ];
 
