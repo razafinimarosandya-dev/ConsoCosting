@@ -2322,7 +2322,7 @@ tbody tr:hover {
       if (dayCounts[i]) {
         const countBadge = document.createElement('div');
         countBadge.style.marginTop = 'auto';
-        countBadge.style.backgroundColor = 'var(--primary-color)';
+        countBadge.style.backgroundColor = '#10b981'; // Emerald Green for success
         countBadge.style.color = '#fff';
         countBadge.style.padding = '4px 8px';
         countBadge.style.borderRadius = '4px';
@@ -2330,7 +2330,7 @@ tbody tr:hover {
         countBadge.style.fontWeight = 'bold';
         countBadge.style.textAlign = 'center';
         countBadge.style.cursor = 'pointer';
-        countBadge.textContent = `${dayCounts[i]} completion${dayCounts[i] > 1 ? 's' : ''}`;
+        countBadge.textContent = `${dayCounts[i]} Completed`;
 
         countBadge.addEventListener('mouseenter', () => { countBadge.style.opacity = '0.8'; });
         countBadge.addEventListener('mouseleave', () => { countBadge.style.opacity = '1'; });
@@ -2346,23 +2346,24 @@ tbody tr:hover {
           const content = document.getElementById('calendar-day-content');
 
           if (modal && title && content) {
-            title.textContent = `Completed CADS on ${monthNames[month]} ${i}, ${year}`;
+            title.textContent = `Completed on ${monthNames[month]} ${i}, ${year}`;
             content.innerHTML = dailyReqs.map((r) => `
-              <div style="padding: 10px 8px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-                <div style="display:flex; flex-direction: column;">
-                  <span style="font-weight: 500; color: var(--text-main);">${r.id || 'Unknown ID'}</span>
-                  <span style="font-size: 12px; color: var(--text-muted);">${r.customer || r.Customer || 'No Customer'}</span>
+                <div style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                  <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-weight: 700; color: #1f2937;">${r.id || 'N/A'}</span>
+                    <span style="font-size: 12px; color: #6b7280;">${r.customer || r.Customer || 'No Customer'} • ${r.style || r.Style || 'No Style'}</span>
+                  </div>
+                  <button class="btn-outline calendar-details-btn" data-id="${r.id}" style="padding: 6px 12px; font-size: 12px;">Details</button>
                 </div>
-                <button class="btn-outline calendar-details-btn" data-id="${r.id || ''}" style="padding: 6px 10px; font-size: 12px; display: inline-flex;">Details</button>
-              </div>
-            `).join('');
+              `).join('');
 
-            content.querySelectorAll('.calendar-details-btn').forEach((btn) => {
-              btn.addEventListener('click', (ev) => {
-                const rid = ev.currentTarget.getAttribute('data-id');
-                showDetails(rid);
+            content.querySelectorAll('.calendar-details-btn').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                modal.style.display = 'none';
+                showDetails(e.currentTarget.dataset.id);
               });
             });
+
             modal.style.display = 'flex';
           }
         });
