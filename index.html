@@ -1546,6 +1546,7 @@ tbody tr:hover {
         <h2 style="margin-bottom: 24px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; color: var(--primary-color); font-size: 20px; font-weight: 700;">Upload Action Confirmation</h2>
         <div id="conso-upload-content"></div>
         <div id="u-fabric-details" style="margin-top: 16px;"></div>
+        <div id="u-folder-container"></div>
         <div style="margin-bottom: 24px;">
           <!-- Populated via JS -->
         </div>
@@ -1586,6 +1587,7 @@ tbody tr:hover {
         <h2 style="margin-bottom: 24px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; color: var(--primary-color); font-size: 20px; font-weight: 700;">Request Details</h2>
         <div id="details-content"></div>
         <div id="d-fabric-details" style="margin-top: 16px;"></div>
+        <div id="d-folder-container"></div>
         <div style="margin-bottom: 24px;">
           <!-- Populated via JS -->
         </div>
@@ -2026,22 +2028,26 @@ tbody tr:hover {
         </div>`;
     });
     html += `</div>`;
+    content.innerHTML = html;
 
-    // Folder Link
+    // Fabric Details first
+    renderFabricDetails(rowData, 'u-fabric-details');
+
+    // Folder Link after
     const folderValue = rowData.folder_path || rowData.folderLink || rowData.Folder_Path || '-';
     let folderDisplay = folderValue;
     if (folderValue !== '-' && String(folderValue).startsWith('http')) {
       folderDisplay = `<a href="${folderValue}" target="_blank" style="color: var(--primary-color); font-weight: 700; text-decoration: underline;">Open Folder</a>`;
     }
+    const uFolder = document.getElementById('u-folder-container');
+    if (uFolder) {
+      uFolder.innerHTML = `
+        <div class="detail-card" style="margin-top: 16px; background: #eff6ff; border-color: #bfdbfe;">
+          <span class="detail-label" style="color: #1e40af;">Folder Path</span>
+          <div class="detail-value">${folderDisplay}</div>
+        </div>`;
+    }
 
-    html += `
-      <div class="detail-card" style="margin-top: 16px; background: #eff6ff; border-color: #bfdbfe;">
-        <span class="detail-label" style="color: #1e40af;">Folder Path</span>
-        <div class="detail-value">${folderDisplay}</div>
-      </div>`;
-
-    content.innerHTML = html;
-    renderFabricDetails(rowData, 'u-fabric-details');
     document.getElementById('conso-upload-modal').style.display = 'flex';
   }
 
@@ -2133,22 +2139,26 @@ tbody tr:hover {
         </div>`;
     });
     html += `</div>`;
+    content.innerHTML = html;
 
-    // Folder Link
+    // Fabric Details first
+    renderFabricDetails(rowData, 'd-fabric-details');
+
+    // Folder Link after
     const folderValue = rowData.folder_path || rowData.folderLink || rowData.Folder_Path || '-';
     let folderDisplay = folderValue;
     if (folderValue !== '-' && String(folderValue).startsWith('http')) {
       folderDisplay = `<a href="${folderValue}" target="_blank" style="color: var(--primary-color); font-weight: 700; text-decoration: underline;">Open Folder</a>`;
     }
+    const dFolder = document.getElementById('d-folder-container');
+    if (dFolder) {
+      dFolder.innerHTML = `
+        <div class="detail-card" style="margin-top: 16px; background: #eff6ff; border-color: #bfdbfe;">
+          <span class="detail-label" style="color: #1e40af;">Folder Path</span>
+          <div class="detail-value">${folderDisplay}</div>
+        </div>`;
+    }
 
-    html += `
-      <div class="detail-card" style="margin-top: 16px; background: #eff6ff; border-color: #bfdbfe;">
-        <span class="detail-label" style="color: #1e40af;">Folder Path</span>
-        <div class="detail-value">${folderDisplay}</div>
-      </div>`;
-
-    content.innerHTML = html;
-    renderFabricDetails(rowData, 'd-fabric-details');
     document.getElementById('details-modal').style.display = 'flex';
   }
 
