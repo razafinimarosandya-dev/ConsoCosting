@@ -1783,6 +1783,10 @@ tbody tr:hover {
 
     try {
       const nowIso = new Date().toISOString();
+      // Get connected user email
+      const storedUser = localStorage.getItem('ACC_REMEMBERED_USER');
+      const currentUserEmail = storedUser ? JSON.parse(storedUser).email : '';
+
       await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
@@ -1796,6 +1800,7 @@ tbody tr:hover {
           Conso_Remarks: userRemarks || '',
           Lateness_Remarks: latenessRemarks || '',
           latenessRemarks: latenessRemarks || '',
+          connectedUserEmail: currentUserEmail,
           action: '',
           timestamp: nowIso
         })
