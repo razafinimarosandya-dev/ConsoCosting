@@ -1193,6 +1193,69 @@ tbody tr:hover {
   word-break: break-word;
 }
 
+/* Fabric Table Styling (Synced with Techpack) */
+.fabric-table-wrap {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  margin-top: 12px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+.fabric-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f1f5f9;
+}
+.fabric-table-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.fabric-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.fabric-table th, .fabric-table td {
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  text-align: left;
+}
+.fabric-table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+.fabric-table td {
+  background: #fff;
+  color: #1e293b;
+}
+.fabric-table tr:last-child td { border-bottom: none; }
+.fabric-table th:last-child, .fabric-table td:last-child { border-right: none; }
+.fabric-opt-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--primary-color);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* Modal Styles */
 .pattern-gallery-row--head .pattern-gallery-row__actions {
   text-align: center;
 }
@@ -1481,7 +1544,9 @@ tbody tr:hover {
       <div class="card"
         style="width: 900px; max-width: 95vw; padding: 32px; background: white; border-radius: 12px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
         <h2 style="margin-bottom: 24px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; color: var(--primary-color); font-size: 20px; font-weight: 700;">Upload Action Confirmation</h2>
-        <div id="conso-upload-content" style="margin-bottom: 24px;">
+        <div id="conso-upload-content"></div>
+        <div id="u-fabric-details" style="margin-top: 16px;"></div>
+        <div style="margin-bottom: 24px;">
           <!-- Populated via JS -->
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
@@ -1519,7 +1584,9 @@ tbody tr:hover {
       <div class="card"
         style="width: 900px; max-width: 95vw; padding: 32px; background: white; border-radius: 12px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
         <h2 style="margin-bottom: 24px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; color: var(--primary-color); font-size: 20px; font-weight: 700;">Request Details</h2>
-        <div id="details-content" style="margin-bottom: 24px;">
+        <div id="details-content"></div>
+        <div id="d-fabric-details" style="margin-top: 16px;"></div>
+        <div style="margin-bottom: 24px;">
           <!-- Populated via JS -->
         </div>
         <div style="display: flex; justify-content: flex-end;">
@@ -1657,6 +1724,81 @@ tbody tr:hover {
       const el = document.getElementById(f.id);
       if (el) el.innerHTML = f.vals.map(v => `<option value="${v}">`).join('');
     });
+  }
+
+  function renderFabricDetails(row, targetContainerId = 'd-fabric-details') {
+    const container = document.getElementById(targetContainerId);
+    if (!container) return;
+    container.innerHTML = '';
+
+    const rawAddOns = row['fabric_add_ons'] || row.fabric_add_ons || row['Fabric Add Ons'] || row.Fabric_Add_Ons || '';
+    let fabricRows = [];
+
+    if (rawAddOns && String(rawAddOns).startsWith('[')) {
+      try {
+        fabricRows = JSON.parse(rawAddOns);
+      } catch (e) {
+        console.error("Fabric JSON parse error", e);
+      }
+    }
+
+    if (!Array.isArray(fabricRows) || fabricRows.length === 0) {
+      const mainFabric = row.main_fabric || row.Main_Fabric || row.fabric_add_ons || '';
+      if (mainFabric && mainFabric !== '-' && mainFabric !== '') {
+        fabricRows = [{ opt: 'A', fabric: mainFabric, type: '', gms: '', composition: '', width: '', header: row.Fabric_Header || '' }];
+      }
+    }
+
+    if (!Array.isArray(fabricRows) || fabricRows.length === 0) {
+      container.innerHTML = '<div style="color: var(--text-muted); font-style: italic; font-size: 11px; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">No fabric details available</div>';
+      return;
+    }
+
+    const columns = [
+      { key: "opt", label: "OPT", width: "45px" },
+      { key: "type", label: "Type", width: "" },
+      { key: "fabric", label: "Fabric Name", width: "" },
+      { key: "gms", label: "GMS", width: "70px" },
+      { key: "composition", label: "Composition", width: "" },
+      { key: "width", label: "Width", width: "70px" },
+      { key: "header", label: "Header", width: "" }
+    ];
+
+    const activeCols = columns.filter(col => {
+      if (col.key === 'opt' || col.key === 'fabric') return true;
+      return fabricRows.some(r => {
+        const v = r[col.key];
+        return v != null && String(v).trim() !== '' && String(v).trim() !== '-' && String(v).trim().toLowerCase() !== 'undefined';
+      });
+    });
+
+    const tableHtml = `
+      <div class="fabric-table-wrap">
+        <div class="fabric-table-toolbar">
+          <span class="fabric-table-title">Fabric Details</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="fabric-table">
+            <thead>
+              <tr>
+                ${activeCols.map(c => `<th style="width: ${c.width}">${c.label}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${fabricRows.map(r => `
+                <tr>
+                  ${activeCols.map(c => {
+                    const val = r[c.key] || '-';
+                    if (c.key === 'opt') return `<td><div class="fabric-opt-chip">${val}</div></td>`;
+                    return `<td>${val}</td>`;
+                  }).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+    container.innerHTML = tableHtml;
   }
 
   function updateStats() {
@@ -1899,6 +2041,7 @@ tbody tr:hover {
       </div>`;
 
     content.innerHTML = html;
+    renderFabricDetails(rowData, 'u-fabric-details');
     document.getElementById('conso-upload-modal').style.display = 'flex';
   }
 
@@ -2005,6 +2148,7 @@ tbody tr:hover {
       </div>`;
 
     content.innerHTML = html;
+    renderFabricDetails(rowData, 'd-fabric-details');
     document.getElementById('details-modal').style.display = 'flex';
   }
 
