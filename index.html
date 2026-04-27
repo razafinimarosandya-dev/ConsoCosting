@@ -1586,14 +1586,35 @@ tbody tr:hover {
     return n === 'COMPLETED';
   }
 
-  function formatToDDMMYYYY(dateStr) {
-    if (!dateStr || dateStr === '-') return '-';
-    // If it's already DD/MM/YYYY or DD/MM/YYYY HH:mm:ss, clean it
-    if (typeof dateStr === 'string' && dateStr.includes('/')) {
-      return dateStr.split(' ')[0]; // Take only the date part
+  const globalParseSheetDate = (dateStr) => {
+    if (!dateStr || String(dateStr).trim() === '-' || String(dateStr).trim() === '') return null;
+    const parts = String(dateStr).trim().split(' ');
+    const datePart = parts[0];
+    const timePart = parts[1] || '00:00:00';
+    if (datePart.includes('/')) {
+      const pts = datePart.split('/');
+      if (pts.length === 3) {
+        const yr = pts[2].length === 2 ? '20' + pts[2] : pts[2];
+        const d = new Date(`${yr}-${pts[1]}-${pts[0]}T${timePart}`);
+        if (!isNaN(d)) return d;
+      }
     }
-    const d = new Date(dateStr);
-    if (isNaN(d)) return dateStr;
+    const fallback = new Date(dateStr);
+    return isNaN(fallback) ? null : fallback;
+  };
+
+  function formatToDDMMYYYY(dateValue) {
+    if (!dateValue || dateValue === '-') return '-';
+    // If it's already a Date object, format it
+    if (dateValue instanceof Date) {
+      const dd = String(dateValue.getDate()).padStart(2, '0');
+      const mm = String(dateValue.getMonth() + 1).padStart(2, '0');
+      const yyyy = dateValue.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+    // Parse using our robust parser
+    const d = globalParseSheetDate(dateValue);
+    if (!d) return String(dateValue); // Return original if parse fails
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
@@ -2200,7 +2221,7 @@ tbody tr:hover {
       const styleDisp = row.style || row.Style || '-';
       const customerDisp = row.customer || row.Customer || '-';
       const plDisp = row.assignee || 'Unassigned';
-      const cadsDisp = row.Cads_Uploaded_Date || row.Costing_Ready_Date || '-';
+      const cadsDisp = formatToDDMMYYYY(row.Cads_Uploaded_Date || row.cads_uploaded_date || row.Costing_Ready_Date);
       const statusDisp = row.status || 'COMPLETED';
       const av = row.avatar || 'https://i.pravatar.cc/150?u=' + encodeURIComponent(safeId);
 
@@ -2276,23 +2297,6 @@ tbody tr:hover {
 
     const dayCounts = {};
 
-    const globalParseSheetDate = (dateStr) => {
-      if (!dateStr || String(dateStr).trim() === '-' || String(dateStr).trim() === '') return null;
-      const parts = String(dateStr).trim().split(' ');
-      const datePart = parts[0];
-      const timePart = parts[1] || '00:00:00';
-      if (datePart.includes('/')) {
-        const pts = datePart.split('/');
-        if (pts.length === 3) {
-          const yr = pts[2].length === 2 ? '20' + pts[2] : pts[2];
-          const d = new Date(`${yr}-${pts[1]}-${pts[0]}T${timePart}`);
-          if (!isNaN(d)) return d;
-        }
-      }
-      const fallback = new Date(dateStr);
-      return isNaN(fallback) ? null : fallback;
-    };
-
     const getCalendarDateStr = (row) => row.Cads_Uploaded_Date || row.cads_uploaded_date;
 
     const calendarRows = allRequests.filter((r) => isCadsCompletedStatus(r.status));
@@ -2353,7 +2357,7 @@ tbody tr:hover {
           const content = document.getElementById('calendar-day-content');
 
           if (modal && title && content) {
-            title.textContent = `Completed on ${monthNames[month]} ${i}, ${year}`;
+            title.textContent = `Completed on ${String(i).padStart(2,'0')}/${String(month+1).padStart(2,'0')}/${year}`;
             content.innerHTML = dailyReqs.map((r) => `
                 <div style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
                   <div style="display: flex; flex-direction: column; gap: 2px;">
