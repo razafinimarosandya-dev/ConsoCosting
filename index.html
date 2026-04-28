@@ -6,6 +6,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Conso Tasks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -234,78 +236,122 @@ button {
   box-shadow: var(--shadow-md);
 }
 
-/* Profile Dropdown Menu */
+/* Profile Dropdown Styles (Dashboard Harmonization) */
 .profile-container {
   position: relative;
   cursor: pointer;
+  margin-left: 8px;
+}
+
+.profile-pic img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: var(--transition);
+}
+
+.profile-container:hover .profile-pic img {
+  transform: scale(1.05);
 }
 
 .user-dropdown {
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
-  width: 240px;
-  background: rgba(255, 255, 255, 0.9);
+  width: 260px;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   box-shadow: var(--shadow-lg);
   padding: 8px;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: var(--transition);
+  z-index: 1001;
+  display: none;
+  flex-direction: column;
+  animation: slideInDown 0.2s ease-out;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .user-dropdown.active {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+  display: flex;
 }
 
 .dropdown-header {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
 }
 
-.dropdown-name {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-main);
+.profile-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
 }
 
-.dropdown-email {
-  display: block;
-  font-size: 12px;
-  color: var(--text-muted);
+.profile-email {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #64748b;
+  word-break: break-all;
+}
+
+.profile-divider {
+  height: 1px;
+  background-color: #f1f5f9;
+  margin: 4px 0;
 }
 
 .dropdown-item {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-main);
+  background: transparent;
+  border: none;
   border-radius: 8px;
-  transition: var(--transition);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e293b;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+  text-decoration: none;
 }
 
 .dropdown-item:hover {
-  background-color: #f3f4f6;
+  background-color: #f1f5f9;
   color: var(--primary-color);
 }
 
-.dropdown-item.signOut {
-  color: #ef4444;
+.dropdown-item i {
+  width: 16px;
+  height: 16px;
 }
 
-.dropdown-item.signOut:hover {
-  background-color: #fef2f2;
+.sign-out-btn {
+  color: #ef4444 !important;
+  font-weight: 600;
+}
+
+.sign-out-btn:hover {
+  background-color: #fef2f2 !important;
 }
 
 /* Main Content */
@@ -1300,28 +1346,32 @@ tbody tr:hover {
         </div>
       </div>
       <div class="nav-right">
-        <button class="icon-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
+        <button class="icon-btn" style="margin-right: 12px; color: #64748b;">
+          <i class="far fa-bell" style="font-size: 18px;"></i>
         </button>
         <div class="profile-container" id="profile-trigger">
-          <img class="avatar" id="user-avatar" src="https://i.pravatar.cc/150?img=52" alt="User Profile" />
+          <div class="profile-pic">
+            <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="User Profile" />
+          </div>
+
           <div class="user-dropdown" id="user-dropdown">
             <div class="dropdown-header">
-              <span class="dropdown-name" id="user-display-name">Guest User</span>
-              <span class="dropdown-email" id="user-display-email">guest@example.com</span>
+              <span class="profile-name" id="dropdown-name">Welcome</span>
+              <span class="profile-email" id="dropdown-email">---</span>
             </div>
-            <a href="#" class="dropdown-item">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              My Profile
+            <div class="profile-divider"></div>
+
+            <a href="#" onclick="redirectTo('https://costing-home.vercel.app/')" class="dropdown-item">
+              <i data-feather="home"></i>
+              <span>Dashboard Home</span>
             </a>
-            <a href="#" class="dropdown-item signOut" id="sign-out-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-              Sign Out
-            </a>
+
+            <div class="profile-divider"></div>
+
+            <button type="button" class="dropdown-item sign-out-btn" id="sign-out-btn">
+              <i data-feather="log-out"></i>
+              <span>Sign Out</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1598,36 +1648,6 @@ tbody tr:hover {
     </div>
 
     <!-- Remarks & Status Lead Modal -->
-    <div class="modal" id="remarks-modal"
-      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
-      <div class="card"
-        style="width: 550px; padding: 24px; background: white; border-radius: 12px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);">
-        <h3 style="margin-bottom: 16px; border-bottom: 1px solid #f3f4f6; padding-bottom: 12px; color: var(--primary-color);">Revert / Update Status</h3>
-        <p style="margin-bottom: 20px; font-size: 14px; color: #6b7280;">C Number: <strong id="remarks-req-id"
-            style="color: #1f2937;">-</strong></p>
-
-        <div style="margin-bottom: 24px;">
-          <label style="display: block; margin-bottom: 10px; font-weight: 600; font-size: 14px; color: #374151;">Remarks / Comments</label>
-          <textarea id="remarks-textarea" rows="5" placeholder="Enter any notes before transitioning..."
-            style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; font-family: inherit; resize: vertical; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='#d1d5db'"></textarea>
-        </div>
-
-        <div id="remarks-status-msg" style="font-size: 13px; color: #059669; margin-bottom: 16px; display: none; font-weight: 500;">✓ Saved</div>
-
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <p style="font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 4px;">Select Next Status:</p>
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-            <button class="btn-primary lead-status-btn" data-status="Awaiting Meeting" style="background-color: #6366f1; font-size: 12px; padding: 10px 4px;">Awaiting Meeting</button>
-            <button class="btn-primary lead-status-btn" data-status="Awaiting Techpack" style="background-color: #f59e0b; font-size: 12px; padding: 10px 4px;">Awaiting Techpack</button>
-            <button class="btn-primary lead-status-btn" data-status="Awaiting Pattern" style="background-color: #10b981; font-size: 12px; padding: 10px 4px;">Awaiting Pattern</button>
-          </div>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f3f4f6;">
-          <button class="btn-secondary" id="close-remarks-btn" style="padding: 8px 20px;">Close / Cancel</button>
-        </div>
-      </div>
-    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
@@ -1863,9 +1883,8 @@ tbody tr:hover {
         <td>${formatToDDMMYYYY(row.Costing_Expected_Date || row.costing_expected_date || row.createdDate)}</td>
         <td><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">AWAITING CONSO</span></td>
         <td style="text-align: center;">
-          <div style="display: flex; justify-content: center; gap: 8px; align-items: center;">
-            <button class="btn-outline upload-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Upload</button>
-            <button class="btn-outline revert-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border-color: #f59e0b; color: #d97706;">Revert</button>
+          <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+            <button class="btn-primary upload-btn" data-id="${safeId}" style="padding: 6px 14px; font-size: 12px; border-radius: 6px; box-shadow: 0 4px 12px rgba(37,99,235,0.2);">Upload</button>
           </div>
         </td>
       `;
@@ -1873,7 +1892,6 @@ tbody tr:hover {
     });
 
     tableBody.querySelectorAll('.upload-btn').forEach(btn => btn.addEventListener('click', () => showUploadModal(btn.dataset.id)));
-    tableBody.querySelectorAll('.revert-btn').forEach(btn => btn.addEventListener('click', () => openRemarks(btn.dataset.id)));
   }
 
   function renderCompleteConsoTable() {
@@ -1916,9 +1934,8 @@ tbody tr:hover {
         <td style="padding: 16px 0;">${formatToDDMMYYYY(row.Cads_Uploaded_Date || row.Costing_Expected_Date || row.createdDate)}</td>
         <td style="padding: 16px 0;"><span class="status-badge" style="background: #ecfdf5; color: #059669; padding: 6px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; white-space: nowrap;">COMPLETED</span></td>
         <td style="padding: 16px 0; text-align: center;">
-          <div style="display: flex; justify-content: center; gap: 6px;">
-            <button class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Details</button>
-            <button class="btn-outline revert-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border-color: #f59e0b; color: #d97706;">Revert</button>
+          <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+            <button class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 14px; font-size: 12px; border-radius: 6px;">Details</button>
           </div>
         </td>
       `;
@@ -1926,7 +1943,6 @@ tbody tr:hover {
     });
 
     completeBody.querySelectorAll('.details-btn').forEach(btn => btn.addEventListener('click', () => showDetails(btn.dataset.id)));
-    completeBody.querySelectorAll('.revert-btn').forEach(btn => btn.addEventListener('click', () => openRemarks(btn.dataset.id)));
   }
 
   function openFolder(id) {
@@ -2162,101 +2178,7 @@ tbody tr:hover {
     document.getElementById('details-modal').style.display = 'flex';
   }
 
-  function openRemarks(id) {
-    const idEl = document.getElementById('remarks-req-id');
-    if (idEl) idEl.textContent = id;
-    document.getElementById('remarks-modal').style.display = 'flex';
-  }
-
-  // --- Revert / Update Status modal logic ---
-  // Keeps the same variable names used across the project.
-  let currentRemarksReqId = null;
-  const remarksModalEl = document.getElementById('remarks-modal');
-  const remarksTextareaEl = document.getElementById('remarks-textarea');
-  const remarksStatusMsgEl = document.getElementById('remarks-status-msg');
-
-  // Capture current id when opening modal (from any button)
-  const _openRemarksOriginal = openRemarks;
-  openRemarks = function (id) {
-    currentRemarksReqId = id;
-    if (remarksStatusMsgEl) {
-      remarksStatusMsgEl.style.display = 'none';
-      remarksStatusMsgEl.textContent = '✓ Saved';
-    }
-    _openRemarksOriginal(id);
-    if (remarksTextareaEl) setTimeout(() => remarksTextareaEl.focus(), 0);
-  };
-
-  function normalizeTargetStatus_(s) {
-    return String(s || '').trim();
-  }
-
-  async function saveConsoStatusChange_(nextStatus) {
-    if (!currentRemarksReqId) {
-      alert('No request selected.');
-      return;
-    }
-    const st = normalizeTargetStatus_(nextStatus);
-    if (!st) return;
-
-    const notes = remarksTextareaEl ? remarksTextareaEl.value.trim() : '';
-
-    try {
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          requestId: currentRemarksReqId,
-          status: st,
-          Status: st,
-          reverseRemarks: notes,
-          Reverse_Remarks: notes,
-          action: 'update', // Match Case 3 in backend
-          timestamp: new Date().toISOString()
-        })
-      });
-
-      // Optimistic UI update
-      const row = allRequests.find(r => r && (r.id === currentRemarksReqId));
-      if (row) {
-        row.status = st;
-        row.Status = st;
-        if (notes) row.Remarks = notes;
-      }
-
-      if (remarksStatusMsgEl) {
-        remarksStatusMsgEl.style.display = 'block';
-        remarksStatusMsgEl.textContent = '✓ Saved (refreshing…)';
-      }
-      if (remarksModalEl) remarksModalEl.style.display = 'none';
-
-      // Refresh to confirm sheet state (no-cors prevents reading response)
-      loadConsoTasks();
-    } catch (err) {
-      console.error(err);
-      alert('Update failed. Please try again.');
-    }
-  }
-
-  // Bind status buttons in modal
-  document.querySelectorAll('.lead-status-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const st = btn.getAttribute('data-status');
-      const allBtns = document.querySelectorAll('.lead-status-btn');
-      const originalText = btn.textContent;
-
-      // Disable all 3 buttons and show spinner on the clicked one
-      allBtns.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.pointerEvents = 'none'; });
-      btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:currentColor;animation:spin 0.8s ease-in-out infinite;vertical-align:sub;margin-right:6px;"></span>Processing...';
-
-      await saveConsoStatusChange_(st);
-
-      // Restore all buttons
-      allBtns.forEach(b => { b.disabled = false; b.style.opacity = '1'; b.style.pointerEvents = 'auto'; });
-      btn.textContent = originalText;
-    });
-  });
+  // Logic related to Revert removed (remarks-modal, Lead buttons, etc)
 
   // --- Filter Modal Bindings ---
   document.getElementById('open-filter').addEventListener('click', () => document.getElementById('filter-modal').style.display = 'flex');
@@ -2390,9 +2312,8 @@ tbody tr:hover {
         <span class="pattern-gallery-cell">${cadsDisp}</span>
         <span class="pattern-gallery-cell"><span class="status-badge success-badge">Completed</span></span>
         <span class="pattern-gallery-row__actions">
-          <div style="display: flex; justify-content: center; gap: 6px;">
-            <button type="button" class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;">Details</button>
-            <button type="button" class="btn-outline gallery-revert-btn" data-id="${safeId}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border-color: #f59e0b; color: #d97706;">Revert</button>
+          <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+            <button type="button" class="btn-outline details-btn" data-id="${safeId}" style="padding: 6px 14px; font-size: 12px; border-radius: 6px;">Details</button>
           </div>
         </span>
       `;
@@ -2402,7 +2323,6 @@ tbody tr:hover {
 
     // Reattach event listeners
     gallery.querySelectorAll('.details-btn').forEach(btn => btn.addEventListener('click', (e) => showDetails(e.currentTarget.dataset.id)));
-    gallery.querySelectorAll('.gallery-revert-btn').forEach(btn => btn.addEventListener('click', (e) => openRemarks(e.currentTarget.dataset.id)));
   }
 
   function setActiveTab(id) {
@@ -2565,70 +2485,98 @@ tbody tr:hover {
 
   // --- Modals ---
   document.getElementById('close-details-btn').addEventListener('click', () => document.getElementById('details-modal').style.display = 'none');
-  document.getElementById('close-remarks-btn').addEventListener('click', () => document.getElementById('remarks-modal').style.display = 'none');
 
-  // --- Session Management ---
-  const REMEMBERED_USER_KEY = 'ACC_REMEMBERED_USER';
-
+  /**
+   * Auth & Session Helpers (Dashboard Harmonization)
+   */
   function consumeUrlSession() {
-    const params = new URLSearchParams(window.location.search);
-    const sessionData = params.get('session');
-    if (sessionData) {
+    const hash = window.location.hash;
+    const urlParams = new URLSearchParams(window.location.search);
+    const querySession = urlParams.get('session');
+
+    let encodedData = null;
+    if (hash.startsWith('#session=')) {
+      encodedData = hash.substring(9);
+    } else if (querySession) {
+      encodedData = querySession;
+    }
+
+    if (encodedData) {
       try {
-        const decoded = JSON.parse(decodeURIComponent(escape(atob(sessionData))));
-        if (decoded && (decoded.loginId || decoded.email)) {
-          localStorage.setItem(REMEMBERED_USER_KEY, JSON.stringify(decoded));
-          const newUrl = window.location.origin + window.location.pathname;
-          window.history.replaceState({}, document.title, newUrl);
+        const decodedData = JSON.parse(decodeURIComponent(escape(atob(encodedData))));
+        if (decodedData && decodedData.loginId) {
+          localStorage.setItem('ACC_REMEMBERED_USER', JSON.stringify(decodedData));
+          window.history.replaceState(null, null, window.location.pathname);
+          return true;
         }
       } catch (e) {
-        console.error('Session decode error:', e);
+        console.error('Failed to parse session from URL:', e);
       }
+    }
+    return false;
+  }
+
+  function redirectTo(url) {
+    if (!url) return;
+    const sessionData = localStorage.getItem('ACC_REMEMBERED_USER');
+    if (sessionData) {
+      const encodedSession = btoa(unescape(encodeURIComponent(sessionData)));
+      const separator = url.includes('?') ? '&' : '?';
+      window.location.href = `${url}${separator}session=${encodedSession}`;
+    } else {
+      window.location.href = url;
     }
   }
 
-  function setupUserSession() {
+  function initProfileDropdown() {
     consumeUrlSession();
-    const storedUser = localStorage.getItem(REMEMBERED_USER_KEY);
+    const REMEMBERED_USER_KEY = 'ACC_REMEMBERED_USER';
     const profileTrigger = document.getElementById('profile-trigger');
-    const dropdown = document.getElementById('user-dropdown');
-    const nameEl = document.getElementById('user-display-name');
-    const emailEl = document.getElementById('user-display-email');
-    const avatarEl = document.getElementById('user-avatar');
+    const userDropdown = document.getElementById('user-dropdown');
     const signOutBtn = document.getElementById('sign-out-btn');
+    const userAvatar = document.getElementById('user-avatar');
 
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        const name = user.username || user.name || user.loginId || 'User';
-        const email = user.email || user.loginId || '';
-        
-        if (nameEl) nameEl.textContent = name;
-        if (emailEl) emailEl.textContent = email;
-        if (avatarEl) avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2563eb&color=fff&bold=true`;
-      } catch (e) {
-        console.error('Session parse error:', e);
+    if (!profileTrigger || !userDropdown) return;
+
+    const storedData = localStorage.getItem(REMEMBERED_USER_KEY);
+    const userData = JSON.parse(storedData || 'null');
+
+    if (userData) {
+      const name = userData.username || userData.name || userData.loginId || userData.loginID || (userData.user && (userData.user.name || userData.user.username)) || 'User';
+      const email = userData.email || userData.loginId || userData.loginID || (userData.user && userData.user.email) || '---';
+
+      if (userAvatar) {
+        userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2563eb&color=fff&bold=true`;
+        userAvatar.alt = name;
       }
+
+      const dName = document.getElementById('dropdown-name');
+      const dEmail = document.getElementById('dropdown-email');
+      if (dName) dName.textContent = name;
+      if (dEmail) dEmail.textContent = email;
     }
 
-    if (profileTrigger && dropdown) {
-      profileTrigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.toggle('active');
-      });
-      document.addEventListener('click', () => dropdown.classList.remove('active'));
-    }
+    profileTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdown.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!profileTrigger.contains(e.target)) {
+        userDropdown.classList.remove('active');
+      }
+    });
 
     if (signOutBtn) {
-      signOutBtn.addEventListener('click', (e) => {
-        e.preventDefault();
+      signOutBtn.addEventListener('click', () => {
         localStorage.removeItem(REMEMBERED_USER_KEY);
-        window.location.href = 'login.html';
+        window.location.href = 'https://costing-app-beta.vercel.app/';
       });
     }
+    if (window.feather) feather.replace();
   }
 
-  setupUserSession();
+  initProfileDropdown();
   loadConsoTasks();
 });
 
