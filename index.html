@@ -2081,13 +2081,6 @@ tbody tr:hover {
   const processUploadBtn = document.getElementById('process-upload-btn');
   if (processUploadBtn) {
     processUploadBtn.addEventListener('click', () => {
-      // Open folder link if available before showing remarks modal
-      const rowData = allRequests.find(r => r.id === currentUploadId);
-      const link = rowData ? (rowData.folder_path || rowData.Folder_Path || rowData.folderLink || '') : '';
-      if (link && String(link).startsWith('http')) {
-        window.open(link, '_blank');
-      }
-
       document.getElementById('conso-upload-modal').style.display = 'none';
       document.getElementById('conso-remarks-textarea').value = '';
       const latenessRemarksTextarea = document.getElementById('conso-lateness-remarks-textarea');
@@ -2107,6 +2100,13 @@ tbody tr:hover {
   if (submitConsoUploadBtn) {
     submitConsoUploadBtn.addEventListener('click', async () => {
       if (currentUploadId) {
+        // Open folder link on final submit
+        const rowData = allRequests.find(r => r.id === currentUploadId);
+        const link = rowData ? (rowData.folder_path || rowData.Folder_Path || rowData.folderLink || '') : '';
+        if (link && String(link).startsWith('http')) {
+          window.open(link, '_blank');
+        }
+
         const remarks = document.getElementById('conso-remarks-textarea').value.trim();
         const latenessRemarks = (document.getElementById('conso-lateness-remarks-textarea')?.value || '').trim();
         const originalText = submitConsoUploadBtn.textContent;
