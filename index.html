@@ -1410,7 +1410,7 @@ tbody tr:hover {
                 <p class="subtitle-text">Managing current production conso deliverables</p>
               </div>
           <div class="header-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <button class="btn-ghost" id="open-filter" style="display: inline-flex; align-items: center;">Filter Data</button>
+            <button class="btn-ghost open-filter-btn" style="display: inline-flex; align-items: center;">Filter Data</button>
             <button class="btn-outline export-btn" id="export-excel-btn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -1460,7 +1460,8 @@ tbody tr:hover {
             <h2 style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Completed (CADS)</h2>
             <p style="color: var(--text-muted); font-size: 14px;">Rows with status Completed and CADS upload date</p>
           </div>
-          <div>
+          <div class="header-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button class="btn-ghost open-filter-btn" style="display: inline-flex; align-items: center; font-weight: 600; color: var(--text-muted);">Filter Data</button>
             <button class="btn-outline export-btn" style="padding: 8px 16px; font-weight: 600; border-color: #d1d5db; color: #374151; display: inline-flex; align-items: center; gap: 8px;">
                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                Export
@@ -2181,7 +2182,9 @@ tbody tr:hover {
   // Logic related to Revert removed (remarks-modal, Lead buttons, etc)
 
   // --- Filter Modal Bindings ---
-  document.getElementById('open-filter').addEventListener('click', () => document.getElementById('filter-modal').style.display = 'flex');
+  document.querySelectorAll('.open-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => document.getElementById('filter-modal').style.display = 'flex');
+  });
   document.getElementById('close-filter-btn').addEventListener('click', () => document.getElementById('filter-modal').style.display = 'none');
   document.getElementById('clear-filter-btn').addEventListener('click', () => {
     document.getElementById('filter-id').value = '';
