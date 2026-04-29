@@ -1410,7 +1410,7 @@ tbody tr:hover {
                 <p class="subtitle-text">Managing current production conso deliverables</p>
               </div>
           <div class="header-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <button class="btn-ghost open-filter-btn" style="display: inline-flex; align-items: center;">Filter Data</button>
+            <button class="btn-ghost open-filter-btn" data-target="active" style="display: inline-flex; align-items: center;">Filter Data</button>
             <button class="btn-outline export-btn" id="export-excel-btn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -1461,7 +1461,7 @@ tbody tr:hover {
             <p style="color: var(--text-muted); font-size: 14px;">Rows with status Completed and CADS upload date</p>
           </div>
           <div class="header-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <button class="btn-ghost open-filter-btn" style="display: inline-flex; align-items: center; font-weight: 600; color: var(--text-muted);">Filter Data</button>
+            <button class="btn-ghost open-filter-btn" data-target="complete" style="display: inline-flex; align-items: center; font-weight: 600; color: var(--text-muted);">Filter Data</button>
             <button class="btn-outline export-btn" style="padding: 8px 16px; font-weight: 600; border-color: #d1d5db; color: #374151; display: inline-flex; align-items: center; gap: 8px;">
                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                Export
@@ -1657,7 +1657,9 @@ tbody tr:hover {
 
   let allRequests = [];
   let currentTab = 'AWAITING CONSO';
-  let advFilter = { id: '', style: '', customer: '', pl: '', status: '' };
+  let advFilterActive = { id: '', style: '', customer: '', pl: '', status: '' };
+  let advFilterComplete = { id: '', style: '', customer: '', pl: '', status: '' };
+  let currentFilterTarget = 'active'; 
   let globalSearchTextConso = '';
   let calCurrentDate = new Date();
 
@@ -1851,11 +1853,11 @@ tbody tr:hover {
         if (!match) return false;
       }
 
-      if (advFilter.id && !(row.id || '').toLowerCase().includes(advFilter.id.toLowerCase())) return false;
-      if (advFilter.style && !(row.style || row.Style || '').toLowerCase().includes(advFilter.style.toLowerCase())) return false;
-      if (advFilter.customer && !(row.customer || row.Customer || '').toLowerCase().includes(advFilter.customer.toLowerCase())) return false;
-      if (advFilter.pl && !(row.assignee || row.PL_Name || '').toLowerCase().includes(advFilter.pl.toLowerCase())) return false;
-      if (advFilter.status && !(row.status || row.Status || '').toLowerCase().includes(advFilter.status.toLowerCase())) return false;
+      if (advFilterActive.id && !(row.id || '').toLowerCase().includes(advFilterActive.id.toLowerCase())) return false;
+      if (advFilterActive.style && !(row.style || row.Style || '').toLowerCase().includes(advFilterActive.style.toLowerCase())) return false;
+      if (advFilterActive.customer && !(row.customer || row.Customer || '').toLowerCase().includes(advFilterActive.customer.toLowerCase())) return false;
+      if (advFilterActive.pl && !(row.assignee || row.PL_Name || '').toLowerCase().includes(advFilterActive.pl.toLowerCase())) return false;
+      if (advFilterActive.status && !(row.status || row.Status || '').toLowerCase().includes(advFilterActive.status.toLowerCase())) return false;
 
       return true;
     });
@@ -1903,11 +1905,11 @@ tbody tr:hover {
 
     const filtered = allRequests.filter(row => {
       if (!isCadsCompletedStatus(row.status)) return false;
-      if (advFilter.id && !(row.id || '').toLowerCase().includes(advFilter.id.toLowerCase())) return false;
-      if (advFilter.style && !(row.style || row.Style || '').toLowerCase().includes(advFilter.style.toLowerCase())) return false;
-      if (advFilter.customer && !(row.customer || row.Customer || '').toLowerCase().includes(advFilter.customer.toLowerCase())) return false;
-      if (advFilter.pl && !(row.assignee || row.PL_Name || '').toLowerCase().includes(advFilter.pl.toLowerCase())) return false;
-      if (advFilter.status && !(row.status || row.Status || '').toLowerCase().includes(advFilter.status.toLowerCase())) return false;
+      if (advFilterComplete.id && !(row.id || '').toLowerCase().includes(advFilterComplete.id.toLowerCase())) return false;
+      if (advFilterComplete.style && !(row.style || row.Style || '').toLowerCase().includes(advFilterComplete.style.toLowerCase())) return false;
+      if (advFilterComplete.customer && !(row.customer || row.Customer || '').toLowerCase().includes(advFilterComplete.customer.toLowerCase())) return false;
+      if (advFilterComplete.pl && !(row.assignee || row.PL_Name || '').toLowerCase().includes(advFilterComplete.pl.toLowerCase())) return false;
+      if (advFilterComplete.status && !(row.status || row.Status || '').toLowerCase().includes(advFilterComplete.status.toLowerCase())) return false;
       return true;
     });
 
@@ -2183,7 +2185,19 @@ tbody tr:hover {
 
   // --- Filter Modal Bindings ---
   document.querySelectorAll('.open-filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => document.getElementById('filter-modal').style.display = 'flex');
+    btn.addEventListener('click', () => {
+      currentFilterTarget = btn.dataset.target || 'active';
+      const currentFilter = currentFilterTarget === 'active' ? advFilterActive : advFilterComplete;
+      
+      // Load current filter values into modal inputs
+      document.getElementById('filter-id').value = currentFilter.id;
+      document.getElementById('filter-style').value = currentFilter.style;
+      document.getElementById('filter-cust').value = currentFilter.customer;
+      document.getElementById('filter-pl').value = currentFilter.pl;
+      document.getElementById('filter-status').value = currentFilter.status;
+      
+      document.getElementById('filter-modal').style.display = 'flex';
+    });
   });
   document.getElementById('close-filter-btn').addEventListener('click', () => document.getElementById('filter-modal').style.display = 'none');
   document.getElementById('clear-filter-btn').addEventListener('click', () => {
@@ -2192,16 +2206,24 @@ tbody tr:hover {
     document.getElementById('filter-cust').value = '';
     document.getElementById('filter-pl').value = '';
     document.getElementById('filter-status').value = '';
-    advFilter = { id: '', style: '', customer: '', pl: '', status: '' };
+    
+    if (currentFilterTarget === 'active') {
+      advFilterActive = { id: '', style: '', customer: '', pl: '', status: '' };
+    } else {
+      advFilterComplete = { id: '', style: '', customer: '', pl: '', status: '' };
+    }
+    
     renderAll();
     document.getElementById('filter-modal').style.display = 'none';
   });
   document.getElementById('apply-filter-btn').addEventListener('click', () => {
-    advFilter.id = document.getElementById('filter-id').value.trim();
-    advFilter.style = document.getElementById('filter-style').value.trim();
-    advFilter.customer = document.getElementById('filter-cust').value.trim();
-    advFilter.pl = document.getElementById('filter-pl').value.trim();
-    advFilter.status = document.getElementById('filter-status').value.trim();
+    const targetFilter = currentFilterTarget === 'active' ? advFilterActive : advFilterComplete;
+    targetFilter.id = document.getElementById('filter-id').value.trim();
+    targetFilter.style = document.getElementById('filter-style').value.trim();
+    targetFilter.customer = document.getElementById('filter-cust').value.trim();
+    targetFilter.pl = document.getElementById('filter-pl').value.trim();
+    targetFilter.status = document.getElementById('filter-status').value.trim();
+    
     renderAll();
     document.getElementById('filter-modal').style.display = 'none';
   });
@@ -2259,11 +2281,11 @@ tbody tr:hover {
         if (!match) return false;
       }
 
-      if (advFilter.id && !(row.id || '').toLowerCase().includes(advFilter.id.toLowerCase())) return false;
-      if (advFilter.style && !(row.style || row.Style || '').toLowerCase().includes(advFilter.style.toLowerCase())) return false;
-      if (advFilter.customer && !(row.customer || row.Customer || '').toLowerCase().includes(advFilter.customer.toLowerCase())) return false;
-      if (advFilter.pl && !(row.assignee || row.PL_Name || '').toLowerCase().includes(advFilter.pl.toLowerCase())) return false;
-      if (advFilter.status && !(row.status || row.Status || '').toLowerCase().includes(advFilter.status.toLowerCase())) return false;
+      if (advFilterComplete.id && !(row.id || '').toLowerCase().includes(advFilterComplete.id.toLowerCase())) return false;
+      if (advFilterComplete.style && !(row.style || row.Style || '').toLowerCase().includes(advFilterComplete.style.toLowerCase())) return false;
+      if (advFilterComplete.customer && !(row.customer || row.Customer || '').toLowerCase().includes(advFilterComplete.customer.toLowerCase())) return false;
+      if (advFilterComplete.pl && !(row.assignee || row.PL_Name || '').toLowerCase().includes(advFilterComplete.pl.toLowerCase())) return false;
+      if (advFilterComplete.status && !(row.status || row.Status || '').toLowerCase().includes(advFilterComplete.status.toLowerCase())) return false;
       
       return true;
     });
